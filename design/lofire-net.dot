@@ -1,0 +1,71 @@
+graph {
+  layout=dot
+  rankdir=LR
+  overlap=false
+
+  bgcolor=transparent
+  fontname="TeX Gyre Bonum"
+  node [fontsize=19; margin=0]
+
+  node [style=bold]
+
+  subgraph clusterCore {
+    label="Core"
+    color="#777777"
+
+    node [shape=doublecircle]
+    A B C D
+  }
+
+  node [shape=circle;style=""]
+
+  subgraph clusterEdge1 {
+    label="Edge 1"
+    color="#777777"
+
+    E F G H
+  }
+
+  subgraph clusterEdge2 {
+    label="Edge 2"
+    color="#777777"
+
+    I J K L
+  }
+
+  subgraph clusterEdge3 {
+    label="Edge 3"
+    color="#777777"
+
+    M N O P
+  }
+
+  {
+    # core links
+    A -- B -- C -- D
+    A -- C
+    D -- B
+  }
+
+  {
+    edge [minlen=2]
+
+    # core-edge links
+    A -- {   M }
+    B -- { E N }
+    C -- { F I }
+    D -- {   J }
+  }
+
+  {
+    # edge links
+    E -- F -- G  -- E
+    E -- H
+
+    { I J }  -- K -- L
+
+    O -- M -- N -- { O P }
+
+  }
+
+}

@@ -1,0 +1,3 @@
+[submodule "pub"]
+	path = pub
+	url = https://github.com/tg-x/tufte-pandoc-css

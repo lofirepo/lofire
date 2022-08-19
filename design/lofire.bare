@@ -1,0 +1,756 @@
+### COMMON DATA TYPES ###
+
+# 32-byte BLAKE3 hash
+type Blake3Hash32 data[32]
+
+# 32-byte hash
+type Hash32 union { Blake3Hash32 }
+
+# 32-byte symmetric key
+type Key32 data[32]
+
+# Curve25519 public key
+type Curve25519PubKey data[32]
+
+# Curve25519 private key
+type Curve25519PrivKey data[32]
+
+# Public key
+type PubKey union { Curve25519PubKey }
+
+# Private key
+type PrivKey union { Curve25519PrivKey }
+
+# Ed25519 signature
+type Ed25519Sig data[64]
+
+# Signature
+type Signature union { Ed25519Sig }
+
+# Timestamp: absolute time in minutes since 2022-02-22 22:22 UTC
+type Timestamp u32
+
+type Seconds u8
+type Minutes u8
+type Hours u8
+type Days u8
+
+ # Relative time (e.g. delay from current time)
+type RelTime union {
+  Seconds | Minutes | Hours | Days
+}
+
+### STORAGE OBJECTS ###
+
+# Object ID
+# BLAKE3 hash over the serialized Object with encrypted content
+type ObjectId Hash32
+
+# Object reference
+type ObjectRef struct {
+  id: ObjectId                 # Object ID
+  key: Key32                   # Encryption key
+}
+
+# Internal node of the Merkle tree
+type InternalNode list<Key32>
+
+# Data chunk at the leaf of the Merkle tree
+type DataChunk data
+
+# List of ObjectId dependencies
+type DepList list<ObjectId>
+
+# Immutable object with an encrypted chunk of data.
+# Data is chunked and stored in a Merkle tree.
+# - expiry: expiry time when the object should be deleted
+#           by all replicas that store a copy of it
+# - content: encrypted using convergent encryption with ChaCha20:
+#   - convergence_key: BLAKE3 derive_key ("LoFiRe Data BLAKE3 key",
+#                                         repo_pubkey + repo_secret)
+#   - key: BLAKE3 keyed hash (convergence_key, plain_object)
+#   - nonce: 0
+type ObjectV1 struct {
+  children: list<ObjectId>     # Objects IDs for child nodes in the Merkle tree
+  deps: union {                # Other objects this object depends on (e.g. Commit deps & acks)
+    list<ObjectId> | ObjectRef # Either a list of Object IDs (max. 8)
+  }                            # or an ObjectRef that contains a DepList
+  expiry: optional<Timestamp>  # Expiry time of this object and all of its children
+  content: union {
+    InternalNode |             # Internal node with references to children
+    DataChunk                  # Leaf node with encrypted data chunk
+  }
+}
+type Object union { ObjectV1 }
+
+# Repository definition
+# Published in root branch, where:
+# - branch_pubkey: repo_pubkey
+# - branch_secret: BLAKE3 derive_key ("LoFiRe Root Branch secret",
+#                                     repo_pubkey + repo_secret)
+type RepositoryV1 struct {
+  id: PubKey                   # Repo public key ID
+  branches: list<ObjectRef>    # List of branches
+  allowExtRequests: bool       # Whether or not to allow external requests
+  metadata: data               # App-specific metadata
+}
+type Repository union { RepositoryV1 }
+
+# Add a branch to the repository
+type AddBranchV1 ObjectRef
+type AddBranch union { AddBranchV1 }
+
+# Remove a branch from the repository
+type RemoveBranchV1 ObjectRef
+type RemoveBranch union { RemoveBranchV1 }
+
+# Commit object types
+type CommitType enum {
+  REPOSITORY ADD_BRANCH REMOVE_BRANCH
+  BRANCH ADD_MEMBERS END_OF_BRANCH
+  TRANSACTION SNAPSHOT COMMIT_ACK
+}
+
+# Member of a branch
+type MemberV1 struct {
+  id: PubKey                    # Member public key ID
+  commitTypes: list<CommitType> # Commit types the member is allowed to publish in the branch
+  metadata: data                # Application-specific metadata (role, permissions, cryptographic material, etc)
+}
+type Member union { MemberV1 }
+
+# Branch definition
+# First commit in a branch, signed by branch key
+# In case of a fork, the commit deps indicate the previous branch heads
+type BranchV1 struct {
+  id: PubKey                   # Branch public key ID
+  topic: PubKey                # Pub/sub topic for publishing events
+  secret: Key32                # Branch secret key
+  members: list<Member>        # Members with permissions
+  quorum: map<CommitType><u32> # Number of acks required for a commit to be valid
+  ackDelay: RelTime            # Delay to send explicit acks if not enough implicit acks arrived by then
+  tags: list<data>             # Tags for organizing branches within the repository
+  metadata: data               # App-specific metadata (validation rules, etc)
+}
+type Branch union { BranchV1 }
+
+# Add members to an existing branch
+# If a member already exists, it overwrites the previous definition,
+# in that case this can only be used for adding new permissions,
+# not to remove existing ones.
+# The quorum and ackDelay can be changed as well
+type AddMembersV1 struct {
+  members: list<Member>        # Members to add, with permissions
+  quorum: optional<map<CommitType><u32>> # New quorum
+  ackDelay: optional<RelTime>  # New ackDelay
+ }
+type AddMembers union { AddMembersV1 }
+
+# End of branch
+# No more commits accepted afterwards, only acks of this commit
+# May reference a fork where the branch continues
+# with possibly different members, permissions, validation rules.
+type EndOfBranchV1 struct {
+  fork: optional<ObjectRef>    # (Encrypted) reference to forked branch (optional)
+  expiry: Timestamp            # Expiry time when all commits in the branch should be deleted
+}
+type EndOfBranch union { EndOfBranchV1 }
+
+# Transaction with CRDT operations
+type TransactionV1 data
+type Transaction union { TransactionV1 }
+
+# Snapshot of a branch
+# with a data structure computed from the commits at the specified head
+type SnapshotV1 struct {
+  heads: list<ObjectId>        # Branch heads the snapshot was made from
+  content: data                # Snapshot data structure
+}
+type Snapshot union { SnapshotV1 }
+
+# Acknowledgement of another commit
+type CommitAckV1 void
+type CommitAck union { CommitAckV1 }
+
+# Commit body, corresponds to CommitType
+type CommitBody union {
+  Repository | AddBranch | RemoveBranch |
+  Branch | AddMembers | EndOfBranch |
+  Transaction | Snapshot | CommitAck
+}
+
+# Commit object
+# Signed by branch key, or one of the members authorized to publish this commit type
+type CommitV1 struct {
+  content: struct {
+    author: PubKey             # Commit author
+    seq: u32                   # Author's commit sequence number in this branch
+    branch: ObjectRef          # Branch the commit belongs to
+    deps: list<ObjectRef>      # Direct dependencies of this commit
+    acks: list<ObjectRef>      # Not directly dependent heads to acknowledge
+    refs: list<ObjectRef>      # Files the commit references
+    metadata: data             # App-specific metadata (commit message, creation time, etc)
+    body: ObjectRef            # Object with a CommitBody inside
+    expiry: optional<Timestamp># Expiry time of the body object
+  }
+  sig: Signature               # Signature over the content by the author
+}
+type Commit union { CommitV1 }
+
+# A file stored in an Object
+type FileV1 struct {
+  contentType: data
+  metadata: data
+  content: data
+}
+type File union { FileV1 }
+
+type Data union { Commit | CommitBody | File }
+
+
+### COMMON DATA TYPES FOR MESSAGES ###
+
+type PeerId PubKey
+
+# IP address
+type IPv4 data[4]
+type IPv6 data[16]
+type IP union { IPv4 | IPv6 }
+type MacAddr data[6]
+
+type IPTransportProtocol enum { TLS QUIC }
+
+type IPTransportAddr struct {
+  ip: IP
+  port: u16
+  protocol: IPTransportProtocol
+}
+
+# Network address
+type NetAddr union { IPTransportAddr }
+
+# Bloom filter (variable size)
+type BloomFilter struct {
+  k: u8                        # Number of hash functions
+  f: data                      # Filter
+}
+
+# Bloom filter (128 B)
+# (m=1024; k=7; p=0.01; n=107)
+type BloomFilter128 data[128]
+
+# Bloom filter (1 KiB)
+# (m=8192; k=7; p=0.01; n=855)
+type BloomFilter1K data[1024]
+
+### OVERLAY MESSAGES ###
+
+# Overlay connection request
+# Sent to an existing overlay member to initiate a session
+type OverlayConnectV1 void
+type OverlayConnect union { OverlayConnectV1 }
+
+# Overlay disconnection request
+# Sent to a connected overlay member to terminate a session
+type OverlayDisconnectV1 void
+type OverlayDisconnect union { OverlayDisconnectV1 }
+
+# Topic advertisement by a publisher
+# Flooded to all peers in overlay
+# Creates subscription routing table entries
+type TopicAdvert struct {
+  content: struct {
+    topic: PubKey              # Topic public key
+    peer: PeerId               # Peer public key
+  }
+  sig: Signature               # Signature over content by topic key
+}
+
+# Topic subscription request by a peer
+# Forwarded towards all publishers along subscription routing table entries
+# that are created by TopicAdverts
+# Creates event routing table entries along the path
+type SubReq struct {
+  id: u64                      # Random ID generated by the subscriber
+  topic: PubKey                # Topic public key
+}
+
+# Topic subscription acknowledgement by a publisher
+# Sent to all subscribers in an Event
+type SubAck struct {
+  id: u64                     # SubReq ID to acknowledge
+}
+
+# Topic unsubscription request by a subscriber
+# A broker unsubscribes from upstream brokers
+# when it has no more subscribers left
+type UnsubReq struct {
+  topic: PubKey                # Topic public key
+}
+
+# Topic unsubscription acknowledgement
+# Sent to the requestor in response to an UnsubReq
+type UnsubAck struct {
+  topic: PubKey                # Topic public key
+}
+
+# Branch change notification
+# Contains a chunk of a newly added Commit or File referenced by a commit.
+#
+# - key: encryption key for the Commit object in payload,
+#   the key is encrypted using ChaCha20:
+#   - key: BLAKE3 derive_key ("LoFiRe Event ObjectRef ChaCha20 key",
+#                             branch_pubkey + branch_secret +
+#                             publisher_pubkey)
+type ChangeV1 struct {
+  content: Object            # Object with encrypted content
+  key: optional<Key32>       # Encrypted key for the Commit object in content
+}
+type Change union { ChangeV1 }
+
+type EventBody union {
+  SubAck |
+  Change
+}
+
+# Pub/sub event published in a topic
+# Forwarded along event routing table entries
+#
+# - publisher: BLAKE3 keyed hash over branch member pubkey
+#   - key: BLAKE3 derive_key ("LoFiRe Event publisher BLAKE3 key",
+#                             repo_pubkey + repo_secret +
+#                             branch_pubkey + branch_secret)
+# - payload: Object with encrypted content
+# - nonce: commit_seq
+type EventV1 struct {
+  content: struct {
+    topic: PubKey              # Pub/sub topic
+    publisher: Hash32          # Publisher pubkey hash
+    seq: u32                   # Commit sequence number of publisher
+    body: EventBody            # Event body
+  }
+  sig: Signature               # Signature over content by topic key
+}
+type Event union { EventV1 }
+
+# Object request by ID along the reverse path of a pub/sub topic
+# from a subscriber to all publishers
+type ObjectReqTopicV1 struct {
+  topic: PubKey                # Topic to forward the request in
+  ids: list<ObjectId>          # List of Object IDs to request
+  recursive: bool              # Whether or not to include all children recursively in the response
+  path: list<PeerId>           # List of Peer IDs the request traversed so far
+}
+type ObjectReqTopic union { ObjectReqTopicV1 }
+
+# Object request by ID using a random walk
+type ObjectReqRandomV1 struct {
+  ids: list<ObjectId>          # List of Object IDs to request
+  recursive: bool              # Whether or not to include all children recursively in the response
+  fanout: u8                   # Number of random nodes to forward the request to at each step
+  path: list<PeerId>           # List of Peer IDs the request traversed so far
+}
+type ObjectReqRandom union { ObjectReqRandomV1 }
+
+# Response to an Object request
+# Follows request path with possible shortcuts
+type ObjectResponse struct {
+  path: list<PeerId>           # Response path
+  payload: list<Object>        # Resulting Object(s)
+}
+
+# Request latest events corresponding to the branch heads in a pub/sub topic
+# In response an Event is sent for each commit chunk that belong to branch heads
+# that are not present in the requestor's known heads
+type BranchHeadsReqV1 struct {
+  topic: PubKey                # Topic public key of the branch
+  knownHeads: list<ObjectId>   # Known heads
+}
+type BranchHeadsReq union { BranchHeadsReqV1 }
+
+# Branch synchronization request
+# In response a stream of Objects are sent
+# that are not present in the requestor's known heads and commits
+type BranchSyncReqV1 struct {
+  heads: list<ObjectId>        # Heads to request, including all their deps
+  knownHeads: list<ObjectId>   # Fully synchronized up until these commits
+  knownCommits: BloomFilter    # Known commit IDs since knownHeads
+}
+type BranchSyncReq union { BranchSyncReqV1 }
+
+# Request missed events for a pub/sub topic
+# for the specified range of publisher sequence numbers
+# In response an EventRes then a stream of Events are sent
+type EventReqV1 struct {
+  topic: PubKey                # Topic public key
+  need: list<struct {
+    publisher: Hash32          # Publisher ID
+    from: u32                  # First sequence number to request
+    to: u32                    # Last sequence number to request
+  }>
+}
+type EventReq union { EventReqV1 }
+
+# Response to an EventReq
+type EventResV1 struct {
+  have: list<struct {
+    publisher: Hash32          # Publisher ID
+    from: u32                  # First sequence number to send
+    to: u32                    # Last sequence number to send
+  }>
+}
+type EventRes union { EventResV1 }
+
+type OverlayRequestV1 struct {
+  id: u64                      # Request ID
+  content: union {
+    EventReq |
+    BranchHeadsReq |
+    BranchSyncReq
+  }
+}
+type OverlayRequest union { OverlayRequestV1 }
+
+type OverlayResponseV1 struct {
+  id: u64                      # Request ID
+  result: u8                   # Result
+  content: optional<union {
+    EventRes |
+    Object
+  }>
+}
+type OverlayResponse union { OverlayResponseV1 }
+
+# Peer advertisement
+# Sent periodically across the overlay along random walks
+type PeerAdvertV1 struct {
+  content: struct {
+    peer: PeerId               # Peer ID
+    subs: BloomFilter128       # Topic subscriptions
+    address: list<NetAddr>     # Network addresses
+    version: u16               # Version number
+    metadata: data             # App-specific metadata (profile, cryptographic material, etc)
+  }
+  sig: Signature               # Signature over content by peer's private key
+  ttl: u8                      # Time-to-live, decremented at each hop
+}
+type PeerAdvert union { PeerAdvertV1 }
+
+# Overlay ID
+# - for public overlays that need to be discovered by public key:
+#   BLAKE3 hash over the repository public key
+# - for private overlays:
+#   BLAKE3 keyed hash over the repository public key
+#   - key: BLAKE3 derive_key ("LoFiRe OverlayId BLAKE3 key", repo_secret)
+type OverlayId Hash32
+
+# Overlay session ID
+# Used as a component for key derivation.
+# Each peer generates it randomly when (re)joining the overlay network.
+type SessionId u64
+
+type OverlayMessageContent struct {
+  content: union {
+    OverlayConnect | OverlayDisconnect |
+    PeerAdvert | TopicAdvert |
+    SubReq | UnsubReq | UnsubAck |
+    Event |
+    ObjectReqTopic | ObjectReqRandom |
+    OverlayRequest | OverlayResponse
+  }
+  padding: data                # Optional padding
+}
+
+# Overlay message
+# - overlay_secret: BLAKE3 derive_key ("LoFiRe Overlay BLAKE3 key",
+#                                      repo_pubkey + repo_secret)
+# - content: encrypted with ChaCha20
+#   - key: BLAKE3 derive_key ("LoFiRe OverlayMessage ChaCha20 key",
+#                             overlay_secret + session_id)
+#   - nonce: per-session message sequence number of sending peer
+# - mac: BLAKE3 keyed hash over the encrypted content
+#   - key: BLAKE3 derive_key ("LoFiRe OverlayMessage BLAKE3 key",
+#                             overlay_secret + session_id)
+type OverlayMessageV1 struct {
+  overlay: OverlayId           # Overlay ID
+  session: SessionId           # Session ID
+  content: OverlayMessageContent # Encrypted content
+  mac: Hash32                  # BLAKE3 MAC
+}
+type OverlayMessage union { OverlayMessageV1 }
+
+
+### APPLICATION PROTOCOL ###
+
+# Server hello sent upon a client connection
+type ServerHelloV1 struct {
+  nonce: data                  # Nonce for ClientAuth
+}
+type ServerHello union { ServerHelloV1 }
+
+# Client authentication by a user's device
+type ClientAuthV1 struct {
+  content: struct {
+    user: PubKey               # User pub key
+    device: PubKey             # Device pub key
+    nonce: data                # Nonce from ServerHello
+  }
+  sig: Signature               # Signature by device key
+}
+type ClientAuth union { ClientAuthV1 }
+
+
+# Add user account
+type AddUserV1 struct {
+  content: struct {
+    user: PubKey               # User pub key
+  }
+  sig: Signature               # Signature by admin key
+}
+type AddUser union { AddUserV1 }
+
+# Remove user account
+type DelUserV1 struct {
+  content: struct {
+    user: PubKey               # User pub key
+  }
+  sig: Signature               # Signature by admin key
+}
+type DelUser union { DelUserV1 }
+
+# Authorize device key
+type AuthorizeDeviceKeyV1 struct {
+  content: struct {
+    device: PubKey             # Device pub key
+  }
+  sig: Signature               # Signature by user key
+}
+type AuthorizeDeviceKey union { AuthorizeDeviceKeyV1 }
+
+# Revoke device key
+type RevokeDeviceKeyV1 struct {
+  content: struct {
+    device: PubKey             # Device pub key
+  }
+  sig: Signature               # Signature by user key
+}
+type RevokeDeviceKey union { RevokeDeviceKeyV1 }
+
+# Request to join an overlay
+type OverlayJoinV1 struct {
+  secret: Key32                # Overlay secret
+  peers: list<PeerAdvert>      # Peers to connect to
+}
+type OverlayJoin union { OverlayJoinV1 }
+
+# Request to leave an overlay
+type OverlayLeaveV1 void
+type OverlayLeave union { OverlayLeaveV1 }
+
+# Request an object by ID
+type ObjectGetV1 struct {
+  ids: list<ObjectId>          # List of Object IDs to request
+  includeChildren: bool        # Whether or not to include all children recursively
+  topic: optional<PubKey>      # Topic the object is referenced from
+}
+type ObjectGet union { ObjectGetV1 }
+
+# Request to store an object
+type ObjectPutV1 struct {
+  object: Object
+}
+type ObjectPut union { ObjectPutV1 }
+
+# Request to pin an object
+# Brokers maintain an LRU cache of objects,
+# where old, unused objects might get deleted to free up space for new ones.
+# Pinned objects are retained, regardless of last access.
+# Note that expiry is still observed in case of pinned objects.
+# To make an object survive its expiry it needs to be copied with a different expiry time.
+type ObjectPinV1 struct {
+  id: ObjectId
+}
+type ObjectPin union { ObjectPinV1 }
+
+# Request to unpin an object
+type ObjectUnpinV1 struct {
+  id: ObjectId                 # Object ID
+}
+type ObjectUnpin union { ObjectUnpinV1 }
+
+# Request to copy an object with a different expiry time
+type ObjectCopyV1 struct {
+  id: ObjectId                 # Object ID
+  expiry: optional<Timestamp>  # Expiry
+}
+type ObjectCopy union { ObjectCopyV1 }
+
+# Request to delete an object
+type ObjectDelV1 struct {
+  id: ObjectId                 # Object ID
+ }
+type ObjectDel union { ObjectDelV1 }
+
+# Request subscription to a topic
+# For publishers a private key also needs to be provided
+type TopicSubV1 struct {
+  topic: PubKey                # Topic public key
+  key: optional<PrivKey>       # Topic private key for publishers
+}
+type TopicSub union { TopicSubV1 }
+
+# Request unsubscription from a topic
+type TopicUnsubV1 struct {
+  topic: PubKey
+}
+type TopicUnsub union { TopicUnsubV1 }
+
+# Application request
+type AppRequest struct {
+  id: u64                      # Request ID
+  content: union {
+    OverlayJoin | OverlayLeave |
+    TopicSub | TopicUnsub |
+    Event |
+    ObjectGet | ObjectPut |
+    ObjectPin | ObjectUnpin |
+    ObjectCopy | ObjectDel |
+    BranchHeadsReq | BranchSyncReq
+  }
+}
+
+# Result codes
+type Result enum { OK ERROR }
+
+# Response to a request
+type AppResponse struct {
+  id: u64                      # Request ID
+  result: u8                   # Result (incl but not limited to Result)
+  content: optional<union {
+    Object
+  }>
+}
+
+
+# Application message for an overlay
+type AppOverlayMessage struct {
+  overlay: OverlayId
+  content: union {
+    AppRequest | AppResponse |
+    Event
+  }
+}
+
+# Application message
+type AppMessage struct {
+  content: union {
+    ServerHello | ClientAuth |
+    AddUser | DelUser |
+    AuthorizeDeviceKey | RevokeDeviceKey |
+    AppOverlayMessage
+  }
+  padding: data                # Optional padding
+}
+
+### EXTERNAL REQUESTS ###
+
+# Link to object(s) by ID from a repository that can be shared to non-members
+# The request is sent to a node with a replica of the repository,
+# The response includes the requested objects and all their children recursively,
+# and optionally all object dependencies recursively.
+#
+# - mac: BLAKE3 keyed hash over content
+#   - key: BLAKE3 derive_key ("LoFiRe ExtObjectReq BLAKE3 key",
+#                             repo_pubkey + repo_secret)
+type ExtObjectReqV1 struct {
+  repo: PubKey                 # Repository to request the objects from
+  ids: list<ObjectId>          # List of Object IDs to request, including their children
+  includeChildren: bool        # Whether or not to include all children recursively
+  expiry: optional<Timestamp>  # Expiry time after which the link becomes invalid
+}
+type ExtObjectReq union { ExtObjectReqV1 }
+
+# Branch heads request
+type ExtBranchHeadsReq union { BranchHeadsReqV1 }
+
+# Branch synchronization request
+type ExtBranchSyncReq union { BranchSyncReqV1 }
+
+# External request authenticated by a MAC
+# - mac: BLAKE3 keyed hash over content
+#   - key: BLAKE3 derive_key ("LoFiRe ExtRequest BLAKE3 key",
+#                             repo_pubkey + repo_secret)
+type ExtRequest struct {
+  id: u64                      # Request ID
+  content: union {
+     ExtObjectReq |
+     ExtBranchHeadsReq |
+     ExtBranchSyncReq
+  }
+  mac: Hash32                  # BLAKE3 MAC over content
+}
+
+# Response to an external request
+type ExtResponse struct {
+  id: u64                      # Request ID
+  result: u8                   # Result
+ }
+
+
+### DIRECT MESSAGES ###
+
+# Link/invitation to the repository
+type RepoLinkV1 struct {
+  id: PubKey                   # Repository public key ID
+  secret: Key32                # Repository secret
+  peers: list<PeerAdvert>      # Peers to connect to
+}
+type RepoLink union { RepoLinkV1 }
+
+# Owned repository with private key
+type RepoKeysV1 struct {
+  key: PrivKey                 # Repository private key
+  secret: Key32                # Repository secret
+  peers: list<PeerAdvert>      # Peers to connect to
+}
+type RepoKeys union { RepoKeysV1 }
+
+# Link to object(s) or to a branch from a repository
+# that can be shared to non-members
+type ObjectLinkV1 struct {
+  req: ExtRequest              # Request to send to an overlay peer
+  keys: list<ObjectRef>        # Keys for the requested objects
+}
+type ObjectLink union { ObjectLinkV1 }
+
+### BROKER STORAGE ###
+
+# A topic this node subscribed to in an overlay
+type TopicV1 struct {
+  id: PubKey                   # Topic public key ID
+  privKey: optional<PrivKey>   # Topic private key for publishers
+  heads: list<ObjectId>        # Set of branch heads
+  users: u32                   # Number of local users that subscribed to the topic
+}
+type Topic union { TopicV1 }
+
+# An overlay this node joined
+type OverlayV1 struct {
+  id: OverlayId                # Overlay ID
+  secret: Key32                # Overlay secret
+  peers: list<PeerAdvert>      # Known peers with connected flag
+  topics: list<Topic>          # Topics this node subscribed to in the overlay
+  users: u32                   # Number of local users that joined the overlay
+  lastAccess: Timestamp        # Last access by any user
+}
+type Overlay union { OverlayV1 }
+
+# User accounts
+# stored as user_pubkey -> Account
+type AccountV1 struct {
+  authorizedKeys: list<PubKey> # Authorized device pub keys
+  admin: bool                  # Admins can add/remove user accounts
+  overlays: list<Overlay>      # Overlays joined
+  topics: list<Topic>         # Topics joined, with publisher flag
+}
+type Account union { AccountV1 }

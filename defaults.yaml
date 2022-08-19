@@ -1,0 +1,13 @@
+metadata:
+  lang: en
+  link-citations: true
+  csl: pub/csl/acm-sig-proceedings-long-author-list.csl
+  toc-title: Table of Contents
+
+toc: true
+highlight-style: monochrome
+
+filters:
+- pandoc-fignos
+- pandoc-include
+- pandoc-sidenote
