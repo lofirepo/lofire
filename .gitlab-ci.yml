@@ -1,0 +1,17 @@
+---
+
+image:
+  name: pandoc/alpine:latest
+  entrypoint: ["/bin/sh", "-c"]
+
+pages:
+  stage: deploy
+  script:
+    - apk update
+    - apk add wget make git graphviz
+    - make sub all
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
