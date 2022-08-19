@@ -9,7 +9,8 @@ pages:
   script:
     - apk update
     - apk add wget make git graphviz
-    - make sub all
+    - git submodule update --init --recursive
+    - make
   artifacts:
     paths:
       - public
