@@ -1,14 +1,15 @@
 ---
 
 image:
-  name: pandoc/alpine:latest
+  name: pandoc/core:latest-alpine
   entrypoint: ["/bin/sh", "-c"]
 
 pages:
   stage: deploy
   script:
     - apk update
-    - apk add wget make git graphviz
+    - apk add wget make git graphviz py3-pip
+    - pip install pandoc-include
     - git submodule update --init --recursive
     - make
   artifacts:

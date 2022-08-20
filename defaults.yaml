@@ -10,4 +10,4 @@ highlight-style: monochrome
 filters:
 - pandoc-crossref
 - pandoc-include
-- pandoc-sidenote
+#- pandoc-sidenote
