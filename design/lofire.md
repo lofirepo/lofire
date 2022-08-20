@@ -166,7 +166,9 @@ only forwarding authenticated events received from publishers.
 A data repository contains branches, each with a Directed Acyclic Graph of commits
 linked by causal dependencies among them. See [@fig:repo] for an example.
 
-![Repository R with branches X, Y, Z, commits R*, X*, Y*, acks of X3, Y3, and data D*. Branch Y was forked from X3, and Y3 merges X6. *deps* are solid lines, *acks* are dashed.](lofire-repo.svg){#fig:repo}
+<div class="fullwidth">
+![Repository R with branches X, Y, Z, commits R*, X*, Y*, acks of X3, Y3, and data D*. Branch Y was forked from X3, and Y3 merges X6. *deps* are solid lines, *acks* are dashed.](lofire-repo.svg){#fig:repo .invert}
+</div>
 
 The repository definition is the root of trust for the repository,
 and contains a list of published branches.
@@ -304,7 +306,7 @@ that contains the private key for the user repository.
 
 ## Network architecture
 
-![Core and edge networks of a two-tier community overlay network](lofire-net.svg){#fig:net}
+![Core and edge networks of a two-tier community overlay network](lofire-net.svg){#fig:net .invert}
 
 The network is organized as an independent overlay network for each community,
 composed of community members' edge and core nodes (we use the terms nodes and peers interchangeably).

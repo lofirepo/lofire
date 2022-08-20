@@ -2,10 +2,9 @@
 title: LoFiRe
 subtitle: Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks
 author: "by [P2Pcollab](https://p2pcollab.net)"
-lang: en
 ---
 
-## Design overview
+# Design overview
 
 [Conflict-free replicated data types](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) (CRDTs)
 enable asynchronous, conflict-free collaboration on shared data repositories,
@@ -20,7 +19,7 @@ without relying on a centralized server for coordination,
 and allows resource-constrained mobile and IoT devices on edge networks
 to participate in the network.
 
-### Authorization and access control
+## Authorization and access control
 
 Authorization is based on public-key cryptography,
 where the repository owner can grant access rights to members based on their public key.
@@ -31,22 +30,22 @@ it needs to verify that its causal dependencies are merged already
 and that the author is allowed to perform the operation
 according to the CRDT access control rules defined by the repository owners.
 
-### Immutable objects
+## Immutable objects
 
 Next to mutable objects, data repositories also need to store immutable objects
 using a content-addressed object store that stores encrypted chunked objects in the repository.
 These objects are referenced from the mutable store.
 
 
-## Protocol design & specifications
+# Protocol design & specifications
 
 - [LoFiRe: Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks](design/lofire.html)
 
-## Repositories
+# Repositories
 
 - [Protocol design & specifications](https://gitlab.com/p2pcollab/lofire)
 - [Rust implementation](https://gitlab.com/p2pcollab/lofire-rs)
 
-## See also
+# See also
 
 - [P2Pcollab](https://p2pcollab.net)

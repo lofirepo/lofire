@@ -1,1 +1,1 @@
-pub/Makefile
+pub/pandit/Makefile

@@ -1,11 +1,13 @@
+template: pub/tufte-pandoc-css/tufte.html5
+highlight-style: monochrome
+toc: true
+
 metadata:
   lang: en
   link-citations: true
   csl: pub/csl/acm-sig-proceedings-long-author-list.csl
   toc-title: Table of Contents
-
-toc: true
-highlight-style: monochrome
+  toc-margin: true
 
 filters:
 - pandoc-crossref

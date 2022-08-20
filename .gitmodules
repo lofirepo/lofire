@@ -1,0 +1,12 @@
+[submodule "pub/pandit"]
+	path = pub/pandit
+	url = https://github.com/p2pcollab/pandit
+[submodule "pub/tufte-css"]
+	path = pub/tufte-css
+	url = https://github.com/p2pcollab/tufte-css
+[submodule "pub/tufte-pandoc-css"]
+	path = pub/tufte-pandoc-css
+	url = https://github.com/p2pcollab/tufte-pandoc-css
+[submodule "pub/csl"]
+	path = pub/csl
+	url = https://github.com/citation-style-language/styles
