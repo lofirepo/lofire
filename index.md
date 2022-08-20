@@ -39,7 +39,7 @@ These objects are referenced from the mutable store.
 
 # Protocol design & specifications
 
-- [LoFiRe: Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks](design/lofire.html)
+- [LoFiRe: Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks](design/lofire.md)
 
 # Repositories
 
