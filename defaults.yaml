@@ -8,6 +8,6 @@ toc: true
 highlight-style: monochrome
 
 filters:
-- pandoc-fignos
+- pandoc-crossref
 - pandoc-include
 - pandoc-sidenote

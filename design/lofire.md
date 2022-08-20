@@ -164,7 +164,7 @@ only forwarding authenticated events received from publishers.
 ## Data repositories
 
 A data repository contains branches, each with a Directed Acyclic Graph of commits
-linked by causal dependencies among them. See +@fig:repo for an example.
+linked by causal dependencies among them. See [@fig:repo] for an example.
 
 ![Repository R with branches X, Y, Z, commits R*, X*, Y*, acks of X3, Y3, and data D*. Branch Y was forked from X3, and Y3 merges X6. *deps* are solid lines, *acks* are dashed.](lofire-repo.svg){#fig:repo}
 
@@ -308,7 +308,7 @@ that contains the private key for the user repository.
 
 The network is organized as an independent overlay network for each community,
 composed of community members' edge and core nodes (we use the terms nodes and peers interchangeably).
-See +@fig:net for an example.
+See [@fig:net] for an example.
 
 A data repository is associated with each community overlay network,
 that is used by community members to share and collaborate on data.
