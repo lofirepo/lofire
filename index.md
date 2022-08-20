@@ -32,7 +32,7 @@ according to the CRDT access control rules defined by the repository owners.
 
 ## Immutable objects
 
-Next to mutable objects, data repositories also need to store immutable objects
+Next to mutable objects, data repositories also store immutable objects
 using a content-addressed object store that stores encrypted chunked objects in the repository.
 These objects are referenced from the mutable store.
 
