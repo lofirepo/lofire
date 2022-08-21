@@ -12,4 +12,5 @@ metadata:
 filters:
 - pandoc-crossref
 - pandoc-include
+- type: citeproc
 #- pandoc-sidenote
