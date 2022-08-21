@@ -4,10 +4,10 @@ toc: true
 
 metadata:
   lang: en
-  link-citations: true
-  csl: pub/csl/acm-sig-proceedings-long-author-list.csl
   toc-title: Table of Contents
   toc-margin: true
+  link-citations: true
+  csl: pub/csl/acm-sig-proceedings-long-author-list.csl
 
 filters:
 - pandoc-crossref

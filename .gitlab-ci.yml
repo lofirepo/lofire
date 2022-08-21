@@ -10,8 +10,8 @@ pages:
     - apk update
     - apk add wget make git graphviz py3-pip
     - pip install pandoc-include
-    - git submodule update --init --recursive
-    - make
+    - git submodule update --init
+    - make WEB=1
   artifacts:
     paths:
       - public
