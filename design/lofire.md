@@ -530,12 +530,13 @@ As future work we intend to:
 - Add a name system that allows repositories to define named references to branches, commits, and files,
   as well as allow users to define named references to repositories they subscribe to.
 - Specify a URI scheme that allows references to repositories, branches, commits, and files, either by ID or name.
+- Add external membership & authentication mechanisms that synchronize the repository membership with an external source
 - Describe a publishing workflow, starting from collaboration in a repository that results in published immutable artefacts.
 - Define collaborative editing and publishing of semantic graph data models.
 - Improve and optimize the pub/sub protocol to leverage subscription coverage and interest clustering.
 - Specify LAN protocols based on IP multicast for peer discovery and pub/sub.
 - Specify local-first search & discovery protocols that find information in locally stored data, in the community overlays, and in the global network.
-- Define additional synchronization methods, including synchronizing from a local repository (e.g. on a USB drive)
+- Define additional synchronization methods, including synchronizing from a repository on the local file system (e.g. on a USB drive)
 
 # Data structures
 
