@@ -71,9 +71,6 @@ type InternalNode list<SymKey>
 # Data chunk at a leaf of a Merkle tree
 type DataChunk data
 
-# List of ObjectId dependencies
-type DepList list<ObjectId>
-
 # Content of an Object
 type ObjectContent union {
   # Internal node with references to children
@@ -83,14 +80,18 @@ type ObjectContent union {
   | DataChunk
 }
 
-# List of ObjectIds
-type ObjectList list<ObjectId>
+# List of ObjectId dependencies as encrypted Object content
+type DepList union {
+  list<ObjectId>
+}
 
 # Dependencies of an Object
-# Either a list of Object IDs (max. 8),
-# or an ObjectRef that contains a DepList
 type ObjectDeps union {
-  | ObjectList | ObjectRef
+  # List of Object IDs (max. 8),
+  | list<ObjectId>
+
+  # Reference to an Object that contains a DepList
+  | ObjectRef
 }
 
 # Immutable object with an encrypted chunk of data.
@@ -260,7 +261,7 @@ type Snapshot union {
 }
 
 # Acknowledgement of another commit
-type CommitAck union {
+type Ack union {
   void
 }
 
@@ -268,7 +269,7 @@ type CommitAck union {
 type CommitBody union {
   | Repository | AddBranch | RemoveBranch
   | Branch | AddMembers | EndOfBranch
-  | Transaction | Snapshot | CommitAck
+  | Transaction | Snapshot | Ack
 }
 
 # Commit object
