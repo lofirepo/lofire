@@ -1,7 +1,7 @@
 ---
 title: LoFiRe
 subtitle: Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks
-author: "by [P2Pcollab](https://p2pcollab.net)"
+author: by [P2Pcollab](https://p2pcollab.net)
 ---
 
 # About
