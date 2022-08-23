@@ -138,17 +138,11 @@ type RepositoryV0 struct {
 type Repository union { RepositoryV0 }
 
 # Add a branch to the repository
-type AddBranchV0 struct {
-  # Reference to the Branch
-  branch: ObjectRef
-}
+type AddBranchV0 ObjectRef
 type AddBranch union { AddBranchV0 }
 
 # Remove a branch from the repository
-type RemoveBranchV0 struct {
-  # Reference to the Branch
-  branch: ObjectRef
-}
+type RemoveBranchV0 ObjectRef
 type RemoveBranch union { RemoveBranchV0 }
 
 # Commit object types
@@ -233,14 +227,11 @@ type EndOfBranchV0 struct {
 type EndOfBranch union { EndOfBranchV0 }
 
 # Transaction with CRDT operations
-type TransactionV0 struct {
-  # Transaction data
-  content: data
-}
+type TransactionV0 data
 type Transaction union { TransactionV0 }
 
-# Snapshot of a branch
-# with a data structure computed from the commits at the specified head
+# Snapshot of a Branch
+# Contains a data structure computed from the commits at the specified head.
 type SnapshotV0 struct {
   # Branch heads the snapshot was made from
   heads: list<ObjectId>
@@ -250,7 +241,7 @@ type SnapshotV0 struct {
 }
 type Snapshot union { SnapshotV0 }
 
-# Acknowledgement of another commit
+# Acknowledgement of another Commit
 type Ack union {
   void
 }
@@ -321,7 +312,6 @@ type PeerId PubKey
 type IPv4 data[4]
 type IPv6 data[16]
 type IP union { IPv4 | IPv6 }
-type MacAddr data[6]
 
 type IPTransportProtocol enum { TLS QUIC }
 
@@ -350,6 +340,7 @@ type BloomFilter128 data[128]
 # Bloom filter (1 KiB)
 # (m=8192; k=7; p=0.01; n=855)
 type BloomFilter1K data[1024]
+
 
 ### OVERLAY MESSAGES ###
 
@@ -677,7 +668,7 @@ type OverlayMessageV0 struct {
 type OverlayMessage union { OverlayMessageV0 }
 
 
-### APPLICATION PROTOCOL ###
+### BROKER PROTOCOL ###
 
 # Server hello sent upon a client connection
 type ServerHelloV0 struct {

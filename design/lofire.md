@@ -486,12 +486,21 @@ in order to serve subsequent requests from other subscribers.
 
 The other method involves issuing multiple requests along random walks across the overlay, and routing the response back to the requestor.
 
-### Application protocol
+### Broker protocol
 
-The application protocol is used by applications to interact with the local node,
-and by edge nodes to interact with brokers in the core network.
+The broker protocol is a client-server protocol
+that provides an interface to the message broker running on a core or edge node.
+The broker provides access to its authorized clients to the pub/sub network and object store.
+Applications use it to connect to their local edge node,
+while edge nodes use it to connect to a core node,
+and perform local-first processing on application requests:
+if the local can answer the application request it does so,
+otherwise forwards the query to its configured broker in the core network,
+and/or sends the query to the edge network.
+In case a local node is not available,
+applications can talk directly to a broker in the core network.
 
-It allows applications to request brokers to
+The broker protocol allows applications to request brokers to
 join & leave an overlay (`OverlayJoin` & `OverlayLeave`) ,
 subscribe to & unsubscribe from topics (`TopicSubReq` & `TopicUnsubReq`),
 publish & receive events (`Event`),
