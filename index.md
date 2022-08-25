@@ -81,15 +81,14 @@ Next to mutable objects, data repositories also store immutable objects
 using a content-addressed object store that stores encrypted chunked objects in the repository.
 These objects are referenced from the mutable store.
 
-
 # Protocol design & specifications
 
 - [LoFiRe: Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks](design/lofire.md)
 
 # Repositories
 
-- [Protocol design & specifications](https://gitlab.com/p2pcollab/lofire)
-- [Rust implementation](https://gitlab.com/p2pcollab/lofire-rs)
+- [Protocol design & specifications](https://github.com/p2pcollab/lofire)
+- [Rust implementation](https://github.com/p2pcollab/lofire-rs)
 
 # See also
 
