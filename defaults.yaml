@@ -6,6 +6,7 @@ metadata:
   lang: en
   toc-title: Table of Contents
   toc-margin: true
+  author-prefix: by
   link-citations: true
   csl: pub/csl/acm-sig-proceedings-long-author-list.csl
 

@@ -1,7 +1,9 @@
 ---
 title: LoFiRe
 subtitle: Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks
-author: by [P2Pcollab](https://p2pcollab.net)
+author: "[P2Pcollab](https://p2pcollab.net)"
+header-image: img/cover.png
+header-image-class: invert
 ---
 
 # About
@@ -48,7 +50,6 @@ Network
 Applications
 : CRDT state machine & change validation.
 
-
 # Design overview
 
 Conflict-free replicated data types enable asynchronous,
@@ -93,3 +94,5 @@ These objects are referenced from the mutable store.
 # See also
 
 - [P2Pcollab](https://p2pcollab.net)
+- [Cover image](https://tg-x.net/lsys/#?i=30&r=L%20%3A%20S%0AS%20%3A%20F%2B%3E%5BF-Y%5BS%5D%5DF%29G%0AY%20%3A--%5B%7CF-F-FY%5D%0AG%3A%20FGY%5B%2BF%5D%2BY&p.size=9,0.0001&p.angle=-3769.0402,0.042717&offsets=0,0,0&s.size=8.8,7.5&s.angle=7.6,4&l=0.218&c=black,white,cyan,#e8cc00,#007272,#ff4c00&play=0&anim=return%20%7B%0A%20angle%3A%20t%2F50%2C%0A%20angleG%3A%20t%2F50%2C%0A%20size%3A%20null%2C%0A%20sizeG%3A%20null%2C%0A%20offsetX%3A%20null%2C%0A%20offsetY%3A%20null%2C%0A%20rotation%3A%20null%0A%20%7D&name=pollenate) --
+  [L-system](https://en.wikipedia.org/wiki/L-system) rules
