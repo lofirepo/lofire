@@ -8,7 +8,7 @@ header-image-class: invert
 
 ## About
 
-LoFiRe is a decentralized,
+LoFiRe is a
 [local-first](https://www.inkandswitch.com/local-first/)
 data repository for *collaborative decentralized applications*
 with the following properties:
