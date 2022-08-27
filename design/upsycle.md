@@ -47,6 +47,7 @@ Decentralized publish-subscribe overlays should satisfy a number of desirable pr
 - *robustness* of the overlay: quick recovery after failures and churn
 
 Equally important but not often considered:
+
 - *attack resilience*: the overlay should be resilient to known attacks
 - *subscription privacy*: nodes' subscriptions should be private,
   only common topic subscriptions between two nodes should be discoverable
@@ -66,6 +67,7 @@ Unstructured approaches are able to achieve or approximate a topic-connected ove
 however keeping node degrees bounded is a challenge in such overlays.
 
 To achieve topic-connectivity, [@tera] suggests the following steps:
+
 - *Interest clustering* to cluster peers with common topic subscriptions
 - *Inner-cluster dissemination* to disseminate events inside clusters
 - *Outer-cluster routing* to route to members of a cluster
@@ -156,17 +158,35 @@ aims to address these issues.
 
 The design requirements for UPSYCLE and how we achieve them are the following:
 
-- Scalability :: is achieved by minimizing overlay & suboverlay maintenance
+Scalability
+: is achieved by minimizing overlay & suboverlay maintenance
   and by efficient dissemination in suboverlays
-- Relay-free routing :: is enforced by creating a suboverlay for each topic
-- Bounded node degrees :: are achieved via interest clustering
-- Low latency & duplication factor :: as much as the scalability constrains of suboverlay maintenance allows
-- Reliable delivery & causal order :: is ensured by *causal barriers* and a *reactive error recovery* mechanism
-- Subscription privacy :: subscriptions should be private and only common group membership between peers should be able to be discovered
-- Resiliency :: the use of explicit trust networks make the protocols more resilient to attacks
-- Minimalism :: we strive to minimize protocol complexity and hardware resources,
+
+Relay-free routing
+: is enforced by creating a suboverlay for each topic
+
+Bounded node degrees
+: are achieved via interest clustering
+
+Low latency & duplication factor
+: as much as the scalability constrains of suboverlay maintenance allows
+
+Reliable delivery & causal order
+: is ensured by *causal barriers* and a *reactive error recovery* mechanism
+
+Subscription privacy
+: subscriptions should be private and only common group membership between peers
+  should be able to be discovered
+
+Resiliency
+: the use of explicit trust networks make the protocols more resilient to attacks
+
+Minimalism
+: we strive to minimize protocol complexity and hardware resources,
   e.g. by avoiding expensive Proof-of-Work computations and by employing a two-tier network to minimize resource requirements for mobile nodes
-- Offline-first :: nodes on edge networks should have a copy of all the data they subscribed to
+
+Offline-first
+: nodes on edge networks should have a copy of all the data they subscribed to
   and should be able to communicate directly and opportunistically synchronize with the core network
 
 ## Design overview
@@ -295,9 +315,13 @@ as part of a *reactive error recovery* mechanism described in [@recadeli].
 
 In practice, this means that each event has an ID based on its content hash,
 and the following header fields that facilitate causal ordering and allow detecting missed messages:
-- Direct dependencies :: List of event IDs that are direct dependencies of this event.
+
+Direct dependencies
+: List of event IDs that are direct dependencies of this event.
   This ensures causal delivery.
-- Concurrent events :: List of event IDs that are independent but concurrent to this event.
+
+Concurrent events
+: List of event IDs that are independent but concurrent to this event.
   This allows nodes to detect missed events unrelated to the current one,
   and also serves as an implicit acknowledgement of the receipt of the referenced events.
 
@@ -321,10 +345,11 @@ We use the decentralized secure group messaging protocol suite described in [@ds
 The main components of this protocol suite are:
 
 Authenticated Causal Broadcast (ACB)
-: authenticated messaging service that we use over the P2P pub*sub dissemination channels
+: authenticated messaging service that we use over the P2P pub/sub dissemination channels
 
 Decentralized Group Membership (DGA)
-: protocol that establishes an eventually consistent membership set with causal ordering despite concurrent membership changes
+: protocol that establishes an eventually consistent membership set
+  with causal ordering despite concurrent membership changes
 
 Two-party Secure Messaging (2SM)
 : end-to-end secure messaging protocol with PCS
@@ -333,10 +358,12 @@ Public Key Infrastructure (PKI)
 : protocol for retrieving public key material and ephemeral pre-keys for group members
 
 Decentralized Continuous Group Key Agreement (DCGKA)
-: protocol for deriving keys for group members in response to messages received and membership change events,
+: protocol for deriving keys for group members
+  in response to messages received and membership change events,
   which keys are subsequently used for group message encryption.
 
-Eventual consistency with causal delivery is a key building block for this protocol suite,
+Eventual consistency with causal delivery
+is a key building block for this protocol suite,
 as well as public key-addressed user and group identities.
 
 Applied to the two-tier P2P setting, this protocol suite enables
