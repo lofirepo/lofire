@@ -12,7 +12,7 @@ LoFiRe is a decentralized, collaborative data repository
 with authentication, access control, and change validation.
 It is built on local-first data storage, synchronization, and change notification protocols
 that aim to protect privacy by minimizing metadata exposed to intermediaries.
-It enables local-first, asynchronous, collaboration and data storage within communities
+It enables local-first, asynchronous collaboration and data storage within communities
 while respecting privacy and maintaining data ownership,
 and provides foundations for developing
 decentralized, local-first applications, data stores, and protocols
@@ -83,7 +83,7 @@ Strong eventual consistency
 : Replicas reach the same state after receiving the same set of changes.
 
 Privacy
-: Respect user privacy and minimize the amount of user data and metadata exposed.
+: Respect user privacy and minimize the amount of user data and metadata exposed to intermediaries.
 
 End-to-end security
 : Only the intended recipients should be able

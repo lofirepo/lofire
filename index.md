@@ -1,12 +1,39 @@
 ---
 title: LoFiRe
 subtitle: Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks
+pagetitle: LoFiRe - Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks
 author: "[P2Pcollab](https://p2pcollab.net)"
 header-image: img/cover.png
 header-image-class: invert
 ---
 
-# About
+## About
+
+LoFiRe is a decentralized,
+[local-first](https://www.inkandswitch.com/local-first/)
+data repository for *collaborative decentralized applications*
+with the following properties:
+
+Data ownership and portability
+: Users own their data and have a local copy.
+
+End-to-end encryption
+: Data in the repository is stored end-to-end encrypted.
+
+Permissions & Access control
+: Only authorized members can read and write data in the repository.
+
+Asynchronicity
+: Allow collaboration between users,
+  even if they are not online at the same time or work offline.
+
+Controlled data locality
+: Each repository is replicated within a private network composed only of community member's devices and their authorized replicas.
+
+Multiple devices per user
+: Data is available and synchronized on multiple user devices.
+
+## Introduction
 
 LoFiRe is a decentralized, collaborative data repository
 with authentication, access control, and change validation.
@@ -50,7 +77,7 @@ Network
 Applications
 : CRDT state machine & change validation.
 
-# Design overview
+## Design overview
 
 Conflict-free replicated data types enable asynchronous,
 conflict-free collaboration on shared data repositories,
@@ -65,7 +92,7 @@ without relying on a centralized server for coordination,
 and allows resource-constrained mobile and IoT devices on edge networks
 to participate in the network.
 
-## Authorization and access control
+### Authorization and access control
 
 Authorization is based on public-key cryptography,
 where the repository owner can grant access rights to members based on their public key.
@@ -76,22 +103,22 @@ it needs to verify that its causal dependencies are merged already
 and that the author is allowed to perform the operation
 according to the CRDT access control rules defined by the repository owners.
 
-## Immutable objects
+### Immutable objects
 
 Next to mutable objects, data repositories also store immutable objects
 using a content-addressed object store that stores encrypted chunked objects in the repository.
 These objects are referenced from the mutable store.
 
-# Protocol design & specifications
+## Protocol design & specifications
 
 - [LoFiRe: Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks](design/lofire.md)
 
-# Repositories
+## Repositories
 
 - [Protocol design & specifications](https://github.com/p2pcollab/lofire)
 - [Rust implementation](https://github.com/p2pcollab/lofire-rs)
 
-# See also
+## See also
 
 - [P2Pcollab](https://p2pcollab.net)
 - [Cover image](https://tg-x.net/lsys/#?i=30&r=L%20%3A%20S%0AS%20%3A%20F%2B%3E%5BF-Y%5BS%5D%5DF%29G%0AY%20%3A--%5B%7CF-F-FY%5D%0AG%3A%20FGY%5B%2BF%5D%2BY&p.size=9,0.0001&p.angle=-3769.0402,0.042717&offsets=0,0,0&s.size=8.8,7.5&s.angle=7.6,4&l=0.218&c=black,white,cyan,#e8cc00,#007272,#ff4c00&play=0&anim=return%20%7B%0A%20angle%3A%20t%2F50%2C%0A%20angleG%3A%20t%2F50%2C%0A%20size%3A%20null%2C%0A%20sizeG%3A%20null%2C%0A%20offsetX%3A%20null%2C%0A%20offsetY%3A%20null%2C%0A%20rotation%3A%20null%0A%20%7D&name=pollenate) --

@@ -11,7 +11,7 @@ metadata:
   csl: pub/csl/acm-sig-proceedings-long-author-list.csl
 
 filters:
-- pandoc-crossref
-- pandoc-include
-- type: citeproc
-#- pandoc-sidenote
+  - pandoc-crossref
+  - pandoc-include
+  - type: citeproc
+  #- pandoc-sidenote
