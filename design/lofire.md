@@ -40,7 +40,7 @@ that stores and forwards encrypted objects and change notifications for them,
 thus acting as a pub/sub broker and object store for the edge nodes.
 
 The system is composed of the following components:
-ta
+
 Repository
 : Data structures, encryption, permissions, authentication and access control.
 
