@@ -19,8 +19,15 @@ Data ownership and portability
 End-to-end encryption
 : Data in the repository is stored end-to-end encrypted.
 
+Privacy
+: Minimize the amount of user data and metadata exposed to intermediaries.
+
 Permissions & Access control
-: Only authorized members can read and write data in the repository.
+: Fine-grained rules for writing data in the repository,
+  with the possibility for external.
+
+Tamperproof
+: Once a transaction is stored in a branch, it cannot be removed.
 
 Asynchronicity
 : Allow collaboration between users,
@@ -36,19 +43,20 @@ Multiple devices per user
 
 LoFiRe is a decentralized, collaborative data repository
 with authentication, access control, and change validation.
-It is built on local-first data storage, synchronization, and change notification protocols
+It is built on local-first data storage, synchronization,
+and change notification protocols
 that aim to protect privacy by minimizing metadata exposed to intermediaries.
-It enables local-first, asynchronous, collaboration and data storage within communities
+It enables local-first, asynchronous collaboration and data storage within communities
 while respecting privacy and maintaining data ownership,
-and provides foundations for developing
-decentralized, local-first applications, data stores, and protocols
-(including semantic graph data models, and local-first search & discovery protocols).
+and provides foundations for developing local-first decentralized applications
+and community overlay protocols.
 
 Community members use [local-first software](https://www.inkandswitch.com/local-first/)
-to collaborate around a partition-tolerant permissioned tamper-proof data repository
+to collaborate around a partition-tolerant, permissioned, tamper-proof data repository
 that contains [Directed Acyclic Graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG)
 of causally related transactions with operations on
-[Conflict-free Replicated Data Types](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) (CRDT).
+[Conflict-free Replicated Data Types](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) (CRDT)
+(in other words a permissioned, DAG-structured distributed ledger, or blockchain, with partially ordered CRDT transactions).
 The DAG encodes a partial order of transactions through causality relations,
 and together with a reliable, causal publish-subscribe (pub/sub) protocol for change notifications
 and a DAG synchronization protocol,

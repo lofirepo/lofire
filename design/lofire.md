@@ -10,18 +10,19 @@ bibliography: design/lofire.bib
 
 LoFiRe is a decentralized, collaborative data repository
 with authentication, access control, and change validation.
-It is built on local-first data storage, synchronization, and change notification protocols
+It is built on local-first data storage, synchronization,
+and change notification protocols
 that aim to protect privacy by minimizing metadata exposed to intermediaries.
 It enables local-first, asynchronous collaboration and data storage within communities
 while respecting privacy and maintaining data ownership,
-and provides foundations for developing
-decentralized, local-first applications, data stores, and protocols
-(including semantic graph data models, and local-first search & discovery protocols).
+and provides foundations for developing local-first decentralized applications
+and community overlay protocols.
 
 Community members use local-first software [@local-first]
-to collaborate around a partition-tolerant permissioned tamper-proof data repository
+to collaborate around a partition-tolerant, permissioned, tamper-proof data repository
 that contains Directed Acyclic Graphs (DAG) of causally related transactions
-with operations on Conflict-free Replicated Data Types (CRDT) [@cmrdts].
+with operations on Conflict-free Replicated Data Types (CRDT) [@cmrdts]
+(in other words a permissioned, DAG-structured distributed ledger, or blockchain, with partially ordered CRDT transactions).
 The DAG encodes a partial order of transactions through causality relations,
 and together with a reliable, causal publish-subscribe (pub/sub) protocol for change notifications
 and a DAG synchronization protocol,
@@ -39,7 +40,7 @@ that stores and forwards encrypted objects and change notifications for them,
 thus acting as a pub/sub broker and object store for the edge nodes.
 
 The system is composed of the following components:
-
+ta
 Repository
 : Data structures, encryption, permissions, authentication and access control.
 
@@ -76,6 +77,10 @@ Causality
 Authenticity
 : Changes are signed by their author.
 
+Tamperproof
+: Once a transaction is stored in a branch, it cannot be removed,
+  except by forking the branch.
+
 Access control
 : Rules that specify which users can perform what operations on which part of the data.
 
@@ -83,7 +88,8 @@ Strong eventual consistency
 : Replicas reach the same state after receiving the same set of changes.
 
 Privacy
-: Respect user privacy and minimize the amount of user data and metadata exposed to intermediaries.
+: Respect user privacy and minimize the amount of user data and metadata
+  exposed to intermediaries.
 
 End-to-end security
 : Only the intended recipients should be able
