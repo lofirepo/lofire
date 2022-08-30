@@ -21,8 +21,11 @@ and community overlay protocols.
 Community members use local-first software [@local-first]
 to collaborate around a partition-tolerant, permissioned, tamper-proof data repository
 that contains Directed Acyclic Graphs (DAG) of causally related transactions
-with operations on Conflict-free Replicated Data Types (CRDT) [@cmrdts]
-(in other words a permissioned, DAG-structured distributed ledger, or blockchain, with partially ordered CRDT transactions).
+with operations on Conflict-free Replicated Data Types (CRDTs) [@cmrdts].
+In other words, it is a permissioned, DAG-structured distributed ledger, or blockchain, with partially ordered CRDT transactions.
+CRDTs require only a partial order on transactions, there's no need to determine a total order using a consensus protocol,
+which makes the protocol efficient and light-weight.
+
 The DAG encodes a partial order of transactions through causality relations,
 and together with a reliable, causal publish-subscribe (pub/sub) protocol for change notifications
 and a DAG synchronization protocol,

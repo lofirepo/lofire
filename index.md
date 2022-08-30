@@ -39,6 +39,22 @@ Controlled data locality
 Multiple devices per user
 : Data is available and synchronized on multiple user devices.
 
+## Applications
+
+LoFiRe can be used by local-first decentralized applications
+that use [Conflict-free Replicated Data Types](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) (CRDTs) as their data model.
+It is designed to support collaboration within communities & organizations.
+Decentralized Autonomous Organizations (DAOs), in particular, can use it to support secure and authenticated interaction of their members with a tamper-proof log of decisions.
+
+Here's a selection of applications LoFiRe can be used for
+that we intend to develop later:
+
+- Decentralized wikis & knowledge bases with semantic graph data models
+- Project collaboration and publishing tools
+- Structured discussion and decision making tools
+- Personal information management tools
+- Local-first search & discovery of relevant information and repositories
+
 ## Introduction
 
 LoFiRe is a decentralized, collaborative data repository
@@ -55,8 +71,11 @@ Community members use [local-first software](https://www.inkandswitch.com/local-
 to collaborate around a partition-tolerant, permissioned, tamper-proof data repository
 that contains [Directed Acyclic Graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG)
 of causally related transactions with operations on
-[Conflict-free Replicated Data Types](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) (CRDT)
-(in other words a permissioned, DAG-structured distributed ledger, or blockchain, with partially ordered CRDT transactions).
+[Conflict-free Replicated Data Types](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) (CRDTs).
+In other words, it is a permissioned, DAG-structured distributed ledger, or blockchain, with partially ordered CRDT transactions.
+CRDTs require only a partial order on transactions, there's no need to determine a total order using a consensus protocol,
+which makes the protocol efficient and light-weight.
+
 The DAG encodes a partial order of transactions through causality relations,
 and together with a reliable, causal publish-subscribe (pub/sub) protocol for change notifications
 and a DAG synchronization protocol,
