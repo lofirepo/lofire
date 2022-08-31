@@ -16,6 +16,9 @@ with the following properties:
 Data ownership and portability
 : Users own their data and have a local copy.
 
+Self-Sovereign Identities
+: Users control their identities, and have the choice to use their already existing public key identities or create new identities for each repository.
+
 End-to-end encryption
 : Data in the repository is stored end-to-end encrypted.
 
@@ -43,7 +46,7 @@ Multiple devices per user
 
 LoFiRe can be used by local-first decentralized applications
 that use [Conflict-free Replicated Data Types](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) (CRDTs) as their data model.
-It is designed to support collaboration within communities & organizations.
+It is designed to support collaboration within communities and organizations.
 Decentralized Autonomous Organizations (DAOs), in particular, can use it to support secure and authenticated interaction of their members with a tamper-proof log of decisions.
 
 Here's a selection of applications LoFiRe can be used for

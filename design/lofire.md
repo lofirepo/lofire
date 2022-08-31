@@ -23,8 +23,9 @@ to collaborate around a partition-tolerant, permissioned, tamper-proof data repo
 that contains Directed Acyclic Graphs (DAG) of causally related transactions
 with operations on Conflict-free Replicated Data Types (CRDTs) [@cmrdts].
 In other words, it is a permissioned, DAG-structured distributed ledger, or blockchain, with partially ordered CRDT transactions.
-CRDTs require only a partial order on transactions, there's no need to determine a total order using a consensus protocol,
-which makes the protocol efficient and light-weight.
+CRDTs require only a partial order on transactions,
+there's no need to determine a total order using a consensus protocol,
+which makes the protocol light-weight and low on resource use.
 
 The DAG encodes a partial order of transactions through causality relations,
 and together with a reliable, causal publish-subscribe (pub/sub) protocol for change notifications
