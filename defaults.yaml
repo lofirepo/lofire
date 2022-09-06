@@ -9,9 +9,3 @@ metadata:
   author-prefix: by
   link-citations: true
   csl: pub/csl/acm-sig-proceedings-long-author-list.csl
-
-filters:
-  - pandoc-crossref
-  - pandoc-include
-  - type: citeproc
-  #- pandoc-sidenote

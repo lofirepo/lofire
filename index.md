@@ -151,6 +151,17 @@ These objects are referenced from the mutable store.
 - [Protocol design & specifications](https://github.com/p2pcollab/lofire)
 - [Rust implementation](https://github.com/p2pcollab/lofire-rs)
 
+## Contact
+
+- Email: [#@p2pcollab.net](mailto:#@p2pcollab.net)
+- IRC: [#p2pcollab@irc.oftc.net](ircs://irc.oftc.net:6697/p2pcollab)
+- XMPP: [p2pcollab@chat.disroot.org](xmpp:p2pcollab@chat.disroot.org)
+- Matrix: [#p2pcollab:asra.gr](https://matrix.to/#/#p2pcollab:asra.gr)
+
+## Donate
+
+[We accept donations](https://p2pcollab.net/donate) in order to be able to continue research & development of local-first protocols and applications.
+
 ## See also
 
 - [P2Pcollab](https://p2pcollab.net)

@@ -1,1 +1,7 @@
 number-sections: true
+
+filters:
+  - pandoc-crossref
+  - pandoc-include
+  #- pandoc-sidenote
+  - type: citeproc
