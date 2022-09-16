@@ -153,15 +153,23 @@ Automerge [@automerge] uses operation-based CRDTs and a Bloom-filter-based DAG s
 Their DAG synchronization algorithm is used in our design for branch synchronization.
 Its CRDT state machine and JSON data model are complementary to the design presented here, and can be used in the application layer.
 
-Distributed Mutable Containers (DMC) [@dmc] stores CRDT operations in an encrypted immutable object store, ERIS [@eris]. Operations do not have any causal dependencies among each other, thus partial ordering of operations is not possible, in absence of which nodes can only rely on unsynchronized absolute timestamps when trying to establish an ordering, which cannot be trusted.
+Radicle [@radicle] is a decentralized code collaboration network with Git support that uses public keys for identifying repositories and users, and employs a gossip protocol for repository replication. As it is intended for code collaboration, it relies on manual merges and does not use CRDTs
+that would allow generic collaboration for other use cases, not just code.
+
+Distributed Mutable Containers (DMC) [@dmc] stores CRDT operations in an encrypted immutable object store, ERIS [@eris].
+Operations do not have any causal dependencies among each other, thus partial ordering of operations is not possible,
+in absence of which nodes can only rely on unsynchronized absolute timestamps when trying to establish an ordering, which cannot be trusted.
 Also, there's no guarantee that if a user receives an operation then all users will receive it, either because of network issues or a censorship attempt.
 
 ERIS [@eris] is a content-addressed convergent encryption scheme
 that uses similar cryptographic primitives,
 however, in our design block size is defined by the application layer,
 and padding is only added in the transport protocol and on-disk storage,
-it is not part of content-addressed objects, making the protocol more efficient in terms of bandwidth and disk usage.
-Another difference in our design is that storage nodes can traverse (but not decrypt) the Merkle tree to be able to set an expiry time for the entire tree while keeping data deduplicated, and to be able to return an entire subtree in response to a request.
+it is not part of content-addressed objects,
+making the protocol more efficient in terms of bandwidth and disk usage.
+Another difference in our design is that storage nodes can traverse (but not decrypt)
+the Merkle tree to be able to return an entire subtree in response to a request,
+and set an expiry time for an entire tree while keeping data deduplicated.
 
 LoCaPS [@locaps] is a localized causal pub/sub protocol
 that uses LoCaMu [@locamu], a localized reliable causal multicast protocol.
