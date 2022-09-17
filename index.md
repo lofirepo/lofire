@@ -157,6 +157,7 @@ These objects are referenced from the mutable store.
 - IRC: [#p2pcollab@irc.oftc.net](ircs://irc.oftc.net:6697/p2pcollab)
 - XMPP: [p2pcollab@chat.disroot.org](xmpp:p2pcollab@chat.disroot.org)
 - Matrix: [#p2pcollab:asra.gr](https://matrix.to/#/#p2pcollab:asra.gr)
+- Twitter: [@p2pcollab](https://twitter.com/p2pcollab)
 
 ## Donate
 
