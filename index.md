@@ -49,9 +49,14 @@ that use [Conflict-free Replicated Data Types](https://en.wikipedia.org/wiki/Con
 It is designed to support collaboration within communities and organizations.
 It does not depend on any specific blockchain, does not have a token, and it can synchronize its membership from external sources.
 
-Decentralized Autonomous Organizations (DAOs) can use it to support secure and authenticated interaction of their members
+Communities and organizations (including Decentralized Autonomous Organizations, DAOs)
+can use it to support secure and authenticated interaction of their members
 through wikis, knowledge bases, structured discussions and decision making tools.
-It supports Decentralized Science (DeSci) by providing infrastructure for collaboration around decentralized data repositories and knowledge bases that can be used to share and publish research results.
+
+It supports Open Science and Decentralized Science (DeSci) by providing infrastructure
+for collaboration around decentralized data repositories and knowledge bases
+that can be used to collaborate on research projects,
+as well as share and publish research results.
 
 Here's a selection of applications LoFiRe can be used for
 that we intend to develop once we're ready with the underlying infrastructure:
