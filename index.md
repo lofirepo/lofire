@@ -26,8 +26,7 @@ Privacy
 : Minimize the amount of user data and metadata exposed to intermediaries.
 
 Permissions & Access control
-: Fine-grained rules for writing data in the repository,
-  with the possibility for external.
+: Fine-grained permissions for write access to the repository.
 
 Tamperproof
 : Once a transaction is stored in a branch, it cannot be removed.
@@ -53,10 +52,10 @@ Communities and organizations (including Decentralized Autonomous Organizations,
 can use it to support secure and authenticated interaction of their members
 through wikis, knowledge bases, structured discussions and decision making tools.
 
-It supports Open Science and Decentralized Science (DeSci) by providing infrastructure
+It supports Open Knowledge and Decentralized Science (DeSci) by providing infrastructure
 for collaboration around decentralized data repositories and knowledge bases
 that can be used to collaborate on research projects,
-as well as share and publish research results.
+as well as to share and publish research results and artifacts.
 
 Here's a selection of applications LoFiRe can be used for
 that we intend to develop once we're ready with the underlying infrastructure:
