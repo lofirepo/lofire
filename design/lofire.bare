@@ -113,13 +113,14 @@ type ObjectV0 struct {
   # when the object should be deleted by all replicas
   expiry: optional<Timestamp>
 
-  # Object content
+  # Encrypted ObjectContentV0
+  #
   # Encrypted using convergent encryption with ChaCha20:
   # - convergence_key: BLAKE3 derive_key ("LoFiRe Data BLAKE3 key",
   #                                       repo_pubkey + repo_secret)
   # - key: BLAKE3 keyed hash (convergence_key, plain_object)
   # - nonce: 0
-  content: ObjectContentV0
+  content: data
 }
 type Object union { ObjectV0 }
 
@@ -222,6 +223,11 @@ type AddMembersV0 struct {
 }
 type AddMembers union { AddMembersV0 }
 
+type PlainOrEncryptedObjectRef union {
+  ObjectRef
+  data       # Encrypted ObjectRef
+}
+
 # End of branch
 #
 # No more commits accepted afterwards, only acks of this commit.
@@ -229,7 +235,7 @@ type AddMembers union { AddMembersV0 }
 # with possibly different members, permissions, validation rules.
 type EndOfBranchV0 struct {
   # (Encrypted) reference to forked branch (optional)
-  fork: optional<ObjectRef>
+  fork: optional<PlainOrEncryptedObjectRef>
 
   # Expiry time when all commits in the branch should be deleted
   expiry: Timestamp
@@ -638,7 +644,7 @@ type OverlayResponseV0 struct {
   id: u64
 
   # Result
-  result: u8
+  result: u16
 
   # Response content
   content: optional<OverlayResponseContentV0>
@@ -755,8 +761,8 @@ type ClientAuthV0 struct {
     # User pub key
     user: PubKey
 
-    # Device pub key
-    device: PubKey
+    # Client pub key
+    client: PubKey
 
     # Nonce from ServerHello
     nonce: data
@@ -797,35 +803,35 @@ type DelUserV0 struct {
 }
 type DelUser union { DelUserV0 }
 
-# Content of AuthorizeDeviceKeyV0
-type AuthorizeDeviceKeyContentV0 struct {
-  # Device pub key
-  device: PubKey
+# Content of AuthorizeClientKeyV0
+type AuthorizeClientKeyContentV0 struct {
+  # Client pub key
+  client: PubKey
 }
 
-# Authorize device key
-type AuthorizeDeviceKeyV0 struct {
-  content: AuthorizeDeviceKeyContentV0
+# Authorize client key
+type AuthorizeClientKeyV0 struct {
+  content: AuthorizeClientKeyContentV0
 
   # Signature by user key
   sig: Signature
 }
-type AuthorizeDeviceKey union { AuthorizeDeviceKeyV0 }
+type AuthorizeClientKey union { AuthorizeClientKeyV0 }
 
-# Content of RevokeDeviceKeyV0
-type RevokeDeviceKeyContentV0 struct {
-  # Device pub key
-  device: PubKey
+# Content of RevokeClientKeyV0
+type RevokeClientKeyContentV0 struct {
+  # Client pub key
+  client: PubKey
 }
 
-# Revoke device key
-type RevokeDeviceKeyV0 struct  {
-  content: RevokeDeviceKeyContentV0
+# Revoke client key
+type RevokeClientKeyV0 struct  {
+  content: RevokeClientKeyContentV0
 
   # Signature by user key
   sig: Signature
 }
-type RevokeDeviceKey union { RevokeDeviceKeyV0 }
+type RevokeClientKey union { RevokeClientKeyV0 }
 
 # Request to join an overlay
 type OverlayJoinV0 struct {
@@ -897,13 +903,13 @@ type ObjectDelV0 struct {
 type ObjectDel union { ObjectDelV0 }
 
 # Request subscription to a topic
-# For publishers a private key also needs to be provided
+# For publishers a signed topic
 type TopicSubV0 struct {
   # Topic to subscribe
   topic: PubKey
 
-  # Topic private key for publishers
-  key: optional<PrivKey>
+  # Signed topic advert with the PeerId of the broker
+  advert: optional<TopicAdvertV0>
 }
 type TopicSub union { TopicSubV0 }
 
@@ -949,7 +955,7 @@ type AppResponseV0 struct {
   id: u64
 
   # Result (incl but not limited to Result)
-  result: u8
+  result: u16
   content: optional<AppResponseContentV0>
 }
 type AppResponse union { AppResponseV0 }
@@ -971,7 +977,7 @@ type AppOverlayMessage union { AppOverlayMessageV0 }
 type AppMessageContentV0 union {
   | ServerHello | ClientAuth
   | AddUser | DelUser
-  | AuthorizeDeviceKey | RevokeDeviceKey
+  | AuthorizeClientKey | RevokeClientKey
   | AppOverlayMessage
 }
 
@@ -1034,7 +1040,7 @@ type ExtRequestV0 struct {
   # BLAKE3 MAC over content
   # BLAKE3 keyed hash:
   # - key: BLAKE3 derive_key ("LoFiRe ExtRequest BLAKE3 key",
-  #                           repo_pubkey + repo_secret)
+  #                           repo_pubkey + repo_secret)      # FIXME
   mac: Digest
 }
 type ExtRequest union { ExtRequestV0 }
@@ -1052,7 +1058,7 @@ type ExtResponseV0 struct {
   id: u64
 
   # Result code
-  result: u8
+  result: u16
 
   # Response content
   content: optional<ExtResponseContentV0>
@@ -1110,7 +1116,7 @@ type TopicV0 struct {
   id: PubKey
 
   # Topic private key for publishers
-  privKey: optional<PrivKey>
+  advert: optional<TopicAdvertV0>
 
   # Set of branch heads
   heads: list<ObjectId>
@@ -1146,7 +1152,7 @@ type Overlay union { OverlayV0 }
 #
 # Stored as user_pubkey -> Account
 type AccountV0 struct {
-  # Authorized device pub keys
+  # Authorized client pub keys
   authorizedKeys: list<PubKey>
 
   # Admins can add/remove user accounts
