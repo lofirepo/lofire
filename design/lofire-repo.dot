@@ -1,122 +1,127 @@
 digraph {
-  layout=dot
-  rankdir=BT
-  overlap=false
-
-  bgcolor=transparent
-  fontname="TeX Gyre Bonum"
-  node [fontsize=19; margin=0]
-
-  subgraph clusterR {
-    label="Root branch"
-    color="#777777"
-
-    # branch root
-    node [shape=doublecircle; style=bold]
-    R [rank=0]
-
-    # commits
-    node [shape=circle; style=""]
-    { R3 R2 R1 } -> R
-  }
-
-  subgraph clusterX {
-    label="Branch X"
-    color="#777777"
-
-    # branch root
-    node [shape=doublecircle; style=bold]
-    X
-
-    # commits
-    node [shape=circle; style=""]
-    X1 -> X
-    X3 -> X2 -> X1
-    X4 -> X
-    X5 -> { X1 X4 }
-    X6 -> { X2  }
-    X7 -> { X5 X6 }
-
-    # acks
-    node [shape=point; style=""]
-    { X3a X3b X3c} -> X3
-
-    edge [style="dashed"]
-    X4 -> X3
-    X5 -> { X3a X3b X3c }
-    X6 -> X5
-  }
-
-  subgraph clusterY {
-    label="Branch Y"
-    color="#777777"
-
-    # branch root
-    node [shape=doublecircle; style=bold]
-    Y
-
-    # commits
-    node [shape=circle; style=""]
-    Y1 -> Y
-    Y2 -> Y1
-    Y3 -> { Y1 Y2 }
-
-    # acks
-    node [shape=point; style=""]
-    { Y3a Y3b Y3c} -> Y3
-  }
-
-  subgraph clusterZ {
-    label="Branch Z"
-    color="#777777"
-
-    # branch root
-    node [shape=doublecircle; style=bold]
-    Z
-  }
-
-  subgraph clusterData {
-    label="Data"
-    color="#777777"
-
-    # root node
-    node [shape=doubleoctagon; style=bold]
-    D7 D11
-
-    # data nodes
-    node [shape=box; style=""]
-    D1 D2 D3 D4
-    D8 D9
-
-    # internal nodes
-    node [shape=octagon; style=""]
-    D5 -> { D1 D2 }
-    D6 -> { D3 D4 }
-    D7 -> { D5 D6 }
-
-    D10 -> { D8 D9 }
-    D11 -> { D6 D10 }
-  }
-
-  {
-    # refs to branches
-    edge [minlen=2]
-    R1 -> X
-    R2 -> Y
-    R3 -> Z
-  }
-
-  {
-    # refs to forked branch
-    edge [constraint=false]
-    Y -> X3
-    Y3 -> X6
-  }
-
-  {
-    # refs to data
-    edge [minlen=3 ]
-    X4 -> D7
-    X7 -> D11
-  }
+    layout = dot;
+    rankdir = BT;
+    overlap = false;
+    
+    bgcolor = transparent;
+    fontname = "TeX Gyre Bonum";
+    node [fontsize = 19; margin = 0;];
+    
+    subgraph clusterR {
+        label = "Root branch";
+        color = "#777777";
+        
+        # branch root
+        node [shape = doublecircle; style = bold;];
+        R [rank = 0;];
+        
+        # commits
+        node [shape = circle; style = "";];
+        {R3 R2 R1} -> R;
+    }
+    
+    subgraph clusterX {
+        label = "Branch X";
+        color = "#777777";
+        
+        # branch root
+        node [shape = doublecircle; style = bold;];
+        X;
+        
+        # commits
+        node [shape = circle; style = "";];
+        X1 -> X;
+        X3 -> X2 -> X1;
+        X4 -> X;
+        X5 -> {X1 X4};
+        X6 -> {X2};
+        X7 -> {X5 X6};
+        
+        # acks
+        node [shape = point; style = "";];
+        {X3a X3b X3c} -> X3;
+        
+        edge [style = "dashed";];
+        X4 -> X3;
+        X5 -> {X3a X3b X3c};
+        X6 -> X5;
+    }
+    
+    subgraph clusterY {
+        label = "Branch Y";
+        color = "#777777";
+        
+        # branch root
+        node [shape = doublecircle; style = bold;];
+        Y;
+        
+        # commits
+        node [shape = circle; style = "";];
+        Y1 -> Y;
+        Y2 -> Y1;
+        Y3 -> {Y1 Y2};
+        
+        # acks
+        node [shape = point; style = "";];
+        {Y3a Y3b Y3c} -> Y3;
+    }
+    
+    subgraph clusterZ {
+        label = "Branch Z";
+        color = "#777777";
+        
+        # branch root
+        node [shape = doublecircle; style = bold;];
+        Z;
+    }
+    
+    subgraph clusterData {
+        label = "Data";
+        color = "#777777";
+        
+        # root node
+        node [shape = doubleoctagon; style = bold;];
+        D7;
+        D11;
+        
+        # data nodes
+        node [shape = box; style = "";];
+        D1;
+        D2;
+        D3;
+        D4;
+        D8;
+        D9;
+        
+        # internal nodes
+        node [shape = octagon; style = "";];
+        D5 -> {D1 D2};
+        D6 -> {D3 D4};
+        D7 -> {D5 D6};
+        
+        D10 -> {D8 D9};
+        D11 -> {D6 D10};
+    }
+    
+    subgraph {
+        # refs to branches
+        edge [minlen = 2;];
+        R1 -> X;
+        R2 -> Y;
+        R3 -> Z;
+    }
+    
+    subgraph {
+        # refs to forked branch
+        edge [constraint = false;];
+        Y -> X3;
+        Y3 -> X6;
+    }
+    
+    subgraph {
+        # refs to data
+        edge [minlen = 3; style = "dotted";];
+        X4 -> D7;
+        X7 -> D11;
+    }
 }
