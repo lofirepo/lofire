@@ -149,11 +149,36 @@ with a similar structure to ours, but it is not encrypted, has a single branch,
 and it is synchronized via a higher latency pull-based gossip protocol
 rather than lower latency push-based pub/sub.
 
-Automerge [@automerge] uses operation-based CRDTs and a Bloom-filter-based DAG synchronization algorithm [@bec][@becblog] and provides a JSON data model, however it is missing encryption and a permission system, and uses a synchronous P2P model.
+Automerge [@automerge] uses operation-based CRDTs and a Bloom-filter-based DAG synchronization algorithm [@bec][@becblog] and provides a JSON data model,
+however it is missing encryption and a permission system, and uses a synchronous P2P model.
 Their DAG synchronization algorithm is used in our design for branch synchronization.
 Its CRDT state machine and JSON data model are complementary to the design presented here, and can be used in the application layer.
 
-Radicle [@radicle] is a decentralized code collaboration network with Git support that uses public keys for identifying repositories and users, and employs a gossip protocol for repository replication. As it is intended for code collaboration, it relies on manual merges and does not use CRDTs
+
+Hyper Hyper Space [@hhs] uses immutable append-only Merkle-DAGs together with operation-based CRDTs,
+and a gossip-based P2P synchronization protocol for synchronization of JSON objects,
+with a permission system and cryptographic identities.
+The network is a single-tier P2P system with browsers and headless nodes
+synchronizing data through a gossip protocol.
+Storing private user data in browsers with complex codebases prone to security vulnerabilities is a security risk by itself, since nodes store data unencrypted, which also exposes user data to third-party service providers of headless nodes, which is necessary for asynchronous communication when participants are not online at the same time.
+Permission revocations are not final,
+i.e. new operations with past dependencies can show up that have to be undone by an admin,
+which becomes problematic especially with multiple admins with diverging histories.
+
+In contrast, LoFiRe focuses on privacy, security, and composability.
+It stores user data end-to-end encrypted, supports object expiry and deletion,
+branch forking, and snapshots for compacting operations,
+as well as a quorum-based operation acknowledgement mechanism.
+Permission revocations are implemented via forking, and are final, and support read access revocation, too.
+The system is composable: transactions are entirely application defined,
+including the data format and CRDT types used,
+and thus can be used together with application-defined CRDT types and libraries.
+Similarly, the immutable object store supports arbitrary binary data, it is not restricted to JSON.
+Each repository uses a two-tier P2P network with low-latency asynchronous pub/sub,
+which saves resources on end-user devices and offers them location privacy.
+
+Radicle [@radicle] is a decentralized code collaboration network with Git support that uses public keys for identifying repositories and users,
+and employs a gossip protocol for repository replication. As it is intended for code collaboration, it relies on manual merges and does not use CRDTs
 that would allow generic collaboration for other use cases, not just code.
 
 Distributed Mutable Containers (DMC) [@dmc] stores CRDT operations in an encrypted immutable object store, ERIS [@eris].
@@ -185,7 +210,7 @@ A data repository contains branches, each with a Directed Acyclic Graph of commi
 linked by causal dependencies among them. See [@fig:repo] for an example.
 
 <div class="fullwidth">
-![Repository R with branches X, Y, Z, commits R*, X*, Y*, acks of X3, Y3, and data D*. Branch Y was forked from X3, and Y3 merges X6. *deps* are solid lines, *acks* are dashed.](lofire-repo.svg){#fig:repo .invert}
+![Repository R with branches X, Y, Z, commits R*, X*, Y*, acks of X3, Y3, and data D*. Branch Y was forked from X3, and Y3 merges X6. *deps* are solid lines, *acks* are dashed, *refs* are dotted.](lofire-repo.svg){#fig:repo .invert}
 </div>
 
 The repository definition is the root of trust for the repository,
