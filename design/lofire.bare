@@ -224,8 +224,8 @@ type AddMembersV0 struct {
 type AddMembers union { AddMembersV0 }
 
 type PlainOrEncryptedObjectRef union {
-  ObjectRef
-  data       # Encrypted ObjectRef
+  | ObjectRef
+  | data       # Encrypted ObjectRef
 }
 
 # End of branch
@@ -328,7 +328,11 @@ type Data union {
 ## COMMON DATA TYPES FOR MESSAGES
 ##
 
+# Peer ID
 type PeerId PubKey
+
+# Result code
+type Result enum { OK ERROR }
 
 # IP address
 type IPv4 data[4]
@@ -807,6 +811,33 @@ type RevokeClientKeyV0 struct  {
 }
 type RevokeClientKey union { RevokeClientKeyV0 }
 
+# Content of AppRequest
+type AppRequestContentV0 union {
+  | AddUser | DelUser
+  | AuthorizeClientKey | RevokeClientKey
+}
+
+# Application request
+type AppRequestV0 struct {
+  # Request ID
+  id: u64
+
+  # Request content
+  content: AppRequestContentV0
+}
+type AppRequest union { AppRequestV0 }
+
+
+# Response to an AppRequest
+type AppResponseV0 struct {
+  # Request ID
+  id: u64
+
+  # Result (incl but not limited to Result)
+  result: u16
+}
+type AppResponse union { AppResponseV0 }
+
 # Request to join an overlay
 type OverlayJoinV0 struct {
   # Overlay secret
@@ -905,7 +936,7 @@ type AppOverlayRequestContentV0 union {
   | BranchHeadsReq | BranchSyncReq
 }
 
-# Application request
+# Application overlay request
 type AppOverlayRequestV0 struct {
   # Request ID
   id: u64
@@ -914,9 +945,6 @@ type AppOverlayRequestV0 struct {
   content: AppOverlayRequestContentV0
 }
 type AppOverlayRequest union { AppOverlayRequestV0 }
-
-# Result codes
-type Result enum { OK ERROR }
 
 # Content of AppOverlayResponseV0
 type AppOverlayResponseContentV0 union {
@@ -949,9 +977,7 @@ type AppOverlayMessage union { AppOverlayMessageV0 }
 
 # Content of AppMessage
 type AppMessageContentV0 union {
-  | ServerHello | ClientAuth
-  | AddUser | DelUser
-  | AuthorizeClientKey | RevokeClientKey
+  | AppRequest | AppResponse
   | AppOverlayMessage
 }
 
@@ -1048,7 +1074,7 @@ type ClientHello union { ClientHelloV0 }
 
 # Initiate connection - choose client or ext protocol
 # First message sent by the initiator for a new connection
-type InitConnection union { ClientHello ExtRequest }
+type InitConnection union { ClientHello | ExtRequest }
 
 # Server hello sent upon a client connection
 type ServerHelloV0 struct {
