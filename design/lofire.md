@@ -249,10 +249,11 @@ and an optional expiry time when replicas should delete the object, enabling eph
 
 Blocks are stored in a content-addressed immutable object store
 where the block ID (`BlockId`) is the BLAKE3 hash of the entire serialized block,
-and the object ID is the ID of the root block of the Merkle tree of the object.
+and the object ID (`ObjectId`) is the ID of the root block of the Merkle tree of the object.
 In order to be able to decrypt and read the content of a block or a whole object,
-the user needs not only the `BlockId` (to retrieve it) but also the block key.
-These are combined in a `BlockRef`, which enables its holder to retrieve and read the referenced block or object.
+the user needs not only the `BlockId` or `ObjectId` (to retrieve it) but also the block or object key.
+These are combined in a `BlockRef` or `ObjectRef`,
+which enables its holder to retrieve and read the referenced block or object.
 To the contrary, sharing only the ID of a block or object does not provide a read capability for the recipient.
 
 Implementations should employ an additional layer of encryption and padding

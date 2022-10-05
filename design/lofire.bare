@@ -70,6 +70,12 @@ type BlockRef struct {
   key: SymKey
 }
 
+# ID of the root block of a Merkle tree
+type ObjectId BlockId
+
+# Object reference
+type ObjectRef BlockRef
+
 # Internal node of a Merkle tree
 type InternalNode list<SymKey>
 
@@ -85,25 +91,25 @@ type BlockContentV0 union {
   | Chunk
 }
 
-# List of BlockId dependencies as encrypted Block content
+# List of Object dependencies stored in an Object
 type DepList union {
-  list<BlockId>
+  list<ObjectId>
 }
 
 # Dependencies of a Block
 type BlockDeps union {
-  # List of Block IDs
-  | list<BlockId>
+  # List of Object IDs
+  | list<ObjectId>
 
-  # Reference to an Block that contains a DepList
-  | BlockRef
+  # Reference to an Object that contains a DepList
+  | ObjectRef
 }
 
 # Immutable block with an encrypted chunk of data
 #
 # Data is chunked and stored in a Merkle tree.
 type BlockV0 struct {
-  # Block IDs for child nodes in the Merkle tree
+  # BlockIds for child nodes in the Merkle tree
   children: list<BlockId>
 
   # Other blocks this block depends on (e.g. Commit deps & acks)
@@ -135,7 +141,7 @@ type RepositoryV0 struct {
   id: PubKey
 
   # List of branches
-  branches: list<BlockRef>
+  branches: list<ObjectRef>
 
   # Whether or not to allow external requests
   allowExtRequests: bool
@@ -146,11 +152,11 @@ type RepositoryV0 struct {
 type Repository union { RepositoryV0 }
 
 # Add a branch to the repository
-type AddBranchV0 BlockRef
+type AddBranchV0 ObjectRef
 type AddBranch union { AddBranchV0 }
 
 # Remove a branch from the repository
-type RemoveBranchV0 BlockRef
+type RemoveBranchV0 ObjectRef
 type RemoveBranch union { RemoveBranchV0 }
 
 # Commit block types
@@ -223,9 +229,9 @@ type AddMembersV0 struct {
 }
 type AddMembers union { AddMembersV0 }
 
-type PlainOrEncryptedBlockRef union {
-  | BlockRef
-  | data       # Encrypted BlockRef
+type PlainOrEncryptedObjectRef union {
+  | ObjectRef
+  | data       # Encrypted ObjectRef
 }
 
 # End of branch
@@ -235,7 +241,7 @@ type PlainOrEncryptedBlockRef union {
 # with possibly different members, permissions, validation rules.
 type EndOfBranchV0 struct {
   # (Encrypted) reference to forked branch (optional)
-  fork: optional<PlainOrEncryptedBlockRef>
+  fork: optional<PlainOrEncryptedObjectRef>
 
   # Expiry time when all commits in the branch should be deleted
   expiry: Timestamp
@@ -251,7 +257,7 @@ type Transaction union { TransactionV0 }
 # Contains a data structure computed from the commits at the specified head.
 type SnapshotV0 struct {
   # Branch heads the snapshot was made from
-  heads: list<BlockId>
+  heads: list<ObjectId>
 
   # Snapshot data structure
   content: data
@@ -279,22 +285,22 @@ type CommitContentV0 struct {
   seq: u32
 
   # Branch the commit belongs to
-  branch: BlockRef
+  branch: ObjectRef
 
   # Direct dependencies of this commit
-  deps: list<BlockRef>
+  deps: list<ObjectRef>
 
   # Not directly dependent heads to acknowledge
-  acks: list<BlockRef>
+  acks: list<ObjectRef>
 
   # Files the commit references
-  refs: list<BlockRef>
+  refs: list<ObjectRef>
 
   # App-specific metadata (commit message, creation time, etc)
   metadata: data
 
   # Block with a CommitBody inside
-  body: BlockRef
+  body: ObjectRef
 
   # Expiry time of the body block
   expiry: optional<Timestamp>
@@ -456,7 +462,7 @@ type ChangeV0 struct {
 
   # Encrypted key for the Commit object in content
   # The key is encrypted using ChaCha20:
-  # - key: BLAKE3 derive_key ("LoFiRe Event BlockRef ChaCha20 key",
+  # - key: BLAKE3 derive_key ("LoFiRe Event ObjectRef ChaCha20 key",
   #                           branch_pubkey + branch_secret + publisher_pubkey)
   # - nonce: commit_seq
   key: optional<SymKey>
@@ -506,7 +512,7 @@ type BlockSearchTopicV0 struct {
   # Topic to forward the request in
   topic: PubKey
 
-  # List of Block IDs to request
+  # List of BlockIds to request
   ids: list<BlockId>
 
   # Whether or not to include all children recursively in the response
@@ -519,7 +525,7 @@ type BlockSearchTopic union { BlockSearchTopicV0 }
 
 # Block search along a random walk
 type BlockSearchRandomV0 struct {
-  # List of Block IDs to request
+  # List of BlockIds to request
   ids: list<BlockId>
 
   # Whether or not to include all children recursively in the response
@@ -554,7 +560,7 @@ type BranchHeadsReqV0 struct {
   topic: PubKey
 
   # Known heads
-  knownHeads: list<BlockId>
+  knownHeads: list<ObjectId>
 }
 type BranchHeadsReq union { BranchHeadsReqV0 }
 
@@ -564,10 +570,10 @@ type BranchHeadsReq union { BranchHeadsReqV0 }
 # that are not present in the requestor's known heads and commits
 type BranchSyncReqV0 struct {
   # Heads to request, including all their dependencies
-  heads: list<BlockId>
+  heads: list<ObjectId>
 
   # Fully synchronized until these commits
-  knownHeads: list<BlockId>
+  knownHeads: list<ObjectId>
 
   # Known commit IDs since knownHeads
   knownCommits: BloomFilter
@@ -855,8 +861,8 @@ type OverlayLeave union {
 
 # Request an block by ID
 type BlockGetV0 struct {
-  # List of Block IDs to request
-  ids: list<BlockId>
+  # List of ObjectIds to request
+  ids: list<ObjectId>
 
   # Whether or not to include all children recursively
   includeChildren: bool
@@ -1145,7 +1151,7 @@ type ObjectLinkV0 struct {
   req: ExtRequest
 
   # Keys for the root blocks of the requested objects
-  keys: list<BlockRef>
+  keys: list<ObjectRef>
 }
 type ObjectLink union { ObjectLinkV0 }
 
@@ -1162,7 +1168,7 @@ type TopicV0 struct {
   advert: optional<TopicAdvertV0>
 
   # Set of branch heads
-  heads: list<BlockId>
+  heads: list<ObjectId>
 
   # Number of local users that subscribed to the topic
   users: u32
