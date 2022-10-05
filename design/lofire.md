@@ -234,34 +234,39 @@ The repository structure and storage objects are specified in the [Data structur
 
 ### Data storage
 
-Data is chunked to max. 1 MB chunks and stored encrypted in a Merkle tree.
+Objects are chunked to max. 2 MB chunks and stored encrypted in blocks of a Merkle tree.
 Merkle tree nodes use convergent encryption with a convergence secret
 that allows deduplication inside the repository,
 while defending against confirmation attacks of stored objects.
 
 Both commits of a branch and files outside branches are stored in immutable objects.
-An `Object` contains either a leaf node of the Merkle tree with an encrypted data chunk,
-or an internal node with an unencrypted list of `ObjectID` references to child nodes in the Merkle tree, and an encrypted list of  keys for the referenced children.
-The unencrypted object header at the root of the Merkle tree further contains
-an optional list of dependencies of the object, which is used to list dependencies and acknowledgements of commit objects to allow efficient DAG synchronization,
-and an optional expiry time when replicas should delete the object and its children recursively, enabling ephemeral object storage.
+A `Block` contains either a leaf node of the Merkle tree with an encrypted data chunk,
+or an internal node with an unencrypted list of `BlockId` references to child nodes in the Merkle tree, and an encrypted list of  keys for the referenced children.
+The unencrypted block header at the root of the Merkle tree further contains
+an optional list of dependencies of the object,
+which is used to list dependencies and acknowledgements of commit objects to allow efficient DAG synchronization,
+and an optional expiry time when replicas should delete the object, enabling ephemeral object storage.
 
-Objects are stored in a content-addressed immutable object store
-where the object ID (`ObjectId`) is the BLAKE3 hash of the entire serialized object.
-In order to be able to decrypt and read an object's content, the user needs not only the ObjectId (to retrieve it) but also the object's key. These are combined in an `ObjectRef`, which enables its holder to retrieve and read the referenced object.
-To the contrary, sharing only the ID of an object does not provide a read capability for the recipient.
+Blocks are stored in a content-addressed immutable object store
+where the block ID (`BlockId`) is the BLAKE3 hash of the entire serialized block,
+and the object ID is the ID of the root block of the Merkle tree of the object.
+In order to be able to decrypt and read the content of a block or a whole object,
+the user needs not only the `BlockId` (to retrieve it) but also the block key.
+These are combined in a `BlockRef`, which enables its holder to retrieve and read the referenced block or object.
+To the contrary, sharing only the ID of a block or object does not provide a read capability for the recipient.
 
 Implementations should employ an additional layer of encryption and padding
 before storing objects on disk in order to provide metadata-protection for data at rest,
-i.e. to hide stored object IDs and object sizes.
-Objects can be packed together into larger storage blocks before applying padding
+i.e. to hide stored block IDs and block sizes.
+Blocks can be packed together into larger storage blocks before applying padding
 in order to reduce storage space requirements.
 
 ### Branches & Commits
 
 The repository is organized in branches, which consist of a DAG of commits that contain transactions of CRDT operations.
-Commits are stored chunked in encrypted objects, the same way as files.
-The commit body is stored in a separate object, in order to be able to reference it directly, and to allow deduplication of commit bodies.
+Commits are stored encrypted objects, the same way as files.
+The commit body is stored as a separate object, in order to be able to reference it directly,
+and to allow deduplication of commit bodies.
 
 The first `Commit` in a branch contains the `Branch` definition that specifies the commit validation rules and permissions for the branch,
 as well as the public key for the pub/sub topic used for publishing commits of the branch.
@@ -271,7 +276,7 @@ and acknowledges non-dependent branch heads (via `acks`)
 known by the publisher in order to reduce branching in the DAG,
 and may reference files it depends on (via `refs`).
 The referenced dependencies (`deps`) and acknowledgements (`acks`) in a commit implies that the publisher has validated those commits and all their dependencies recursively.
-The object IDs (but not the keys) of `deps` & `acks` of the `Commit` are listed in the unencrypted `Object` header in order to allow storage nodes to traverse branches for efficient synchronization, without letting them to decrypt and read the content of the objects.
+The object IDs (but not the keys) of `deps` & `acks` of the `Commit` are listed in the unencrypted `Block` header in order to allow storage nodes to traverse branches for efficient synchronization, without letting them to decrypt and read the content of the objects.
 
 To ensure durability of commits,
 a quorum of acknowledgements is needed before a commit can be considered valid.
@@ -407,7 +412,7 @@ Messages in the overlay (`OverlayMessage`) are first padded then encrypted using
 with a key derived from the repository public key & secret and a per-peer random session ID,
 such that only peers in the overlay can decrypt them.
 Message padding provides additional metadata protection
-against observing object sizes transmitted over the network.
+against observing block sizes transmitted over the network.
 
 Peers establish TLS or QUIC connections among each other when connecting over IP.
 However, the system does not depend on IP,
@@ -471,14 +476,14 @@ and at the same time hide the publisher's public key identities from the pub/sub
 
 For each commit, change notifications are sent to the appropriate pub/sub topic
 as a `Change` inside a signed `Event` message.
-Each `Change` contains an encrypted object,
-which is either a chunk of a commit,
-or a chunk of a file that a commit references.
-In case of the first chunk of a commit,
+Each `Change` contains an encrypted `Block`,
+which is either a block of a commit,
+or a block of a file that a commit references.
+In case of the first block of a commit,
 it also contains the encryption key for the commit object,
 encrypted with a key derived from the branch public key & secret,
 and the publisher's public key.
-Brokers cannot decrypt this object, only subscribers,
+Brokers cannot decrypt this block, only subscribers,
 who need to look up the branch secret and the publisher's public key
 matching the publisher hash in the branch definition.
 
@@ -513,10 +518,10 @@ when a subscriber sends subscription requests to multiple peers.
 Replicas perform branch synchronization using a DAG synchronization protocol described in [@bec][@becblog],
 by exchanging branch heads and a Bloom filter of known commits since the last synchronization with the given peer (`BranchSyncReq` & `BranchSyncRes`).
 
-### Object requests
+### Block requests
 
-Objects requests either follow the reverse path of a pub/sub topic from a subscriber to publishers (`ObjectSearchTopic`), or a random walk (`ObjectSearchRandom`).
-The response (`ObjectResponse`) contains one or more objects,
+Blocks requests either follow the reverse path of a pub/sub topic from a subscriber to publishers (`BlockSearchTopic`), or a random walk (`BlockSearchRandom`).
+The response (`BlockResponse`) contains one or more objects,
 and are sent either directly to the requesting node, or along the reverse path of the request.
 
 Requests along a pub/sub topic are effective
@@ -548,7 +553,7 @@ subscribe to & unsubscribe from topics (`TopicSub` & `TopicUnsub`),
 publish & receive events (`Event`),
 synchronize branches (`BranchHeadsReq` & `BranchSyncReq`),
 as well as interact with the object store to:
-download & upload objects (`ObjectGet` & `ObjectPut`),
+download & upload blocks (`BlockGet` & `BlockPut`),
 pin objects for permanent storage (`ObjectPin`),
 copy objects with a different expiry time before sharing (`ObjectCopy`),
 and delete objects from storage (`ObjectDel`).
