@@ -80,7 +80,7 @@ type ObjectRef BlockRef
 type InternalNode list<SymKey>
 
 # Data chunk at a leaf of a Merkle tree
-type Chunk data
+type DataChunk data
 
 # Content of a Block
 type BlockContentV0 union {
@@ -88,7 +88,7 @@ type BlockContentV0 union {
   | InternalNode
 
   # Leaf node with encrypted data chunk
-  | Chunk
+  | DataChunk
 }
 
 # List of Object dependencies stored in an Object
@@ -106,9 +106,9 @@ type ObjectDeps union {
   | ObjectRef
 }
 
-# Immutable block with an encrypted chunk of data
+# Immutable block with encrypted content
 #
-# Data is chunked and stored in a Merkle tree.
+# Object content is chunked and stored as blocks in a Merkle tree.
 type BlockV0 struct {
   # BlockIds for child nodes in the Merkle tree
   children: list<BlockId>
@@ -327,8 +327,8 @@ type FileV0 struct {
 }
 type File union { FileV0 }
 
-# Immutable object stored in encrypted blocks of a Merkle tree
-type Object union {
+# Immutable object content stored in encrypted blocks of a Merkle tree
+type ObjectContent union {
   | Commit | CommitBody | File | DepList
 }
 
