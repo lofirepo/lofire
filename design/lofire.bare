@@ -109,6 +109,7 @@ type ObjectDeps union {
 # Immutable block with encrypted content
 #
 # Object content is chunked and stored as blocks in a Merkle tree.
+# A Block is a Merkle tree node.
 type BlockV0 struct {
   # BlockIds for child nodes in the Merkle tree
   children: list<BlockId>
@@ -557,7 +558,7 @@ type BlockSearchRandomV0 struct {
 }
 type BlockSearchRandom union { BlockSearchRandomV0 }
 
-# Response to a Block request
+# Response to a BlockSearch* request
 #
 # Follows request path with possible shortcuts.
 type BlockResultV0 struct {
@@ -584,7 +585,7 @@ type BranchHeadsReq union { BranchHeadsReqV0 }
 
 # Branch synchronization request
 #
-# In response a stream of Blocks are sent
+# In response a stream of Blocks of the requested Objects are sent
 # that are not present in the requestor's known heads and commits
 type BranchSyncReqV0 struct {
   # Heads to request, including all their dependencies
@@ -790,40 +791,40 @@ type DelUserV0 struct {
 }
 type DelUser union { DelUserV0 }
 
-# Content of AuthorizeClientKeyV0
-type AuthorizeClientKeyContentV0 struct {
+# Content of AddClientV0
+type AddClientContentV0 struct {
   # Client pub key
   client: PubKey
 }
 
-# Authorize client key
-type AuthorizeClientKeyV0 struct {
-  content: AuthorizeClientKeyContentV0
+# Add a client
+type AddClientV0 struct {
+  content: AddClientContentV0
 
   # Signature by user key
   sig: Sig
 }
-type AuthorizeClientKey union { AuthorizeClientKeyV0 }
+type AddClient union { AddClientV0 }
 
-# Content of RevokeClientKeyV0
-type RevokeClientKeyContentV0 struct {
+# Content of DelClientV0
+type DelClientContentV0 struct {
   # Client pub key
   client: PubKey
 }
 
-# Revoke client key
-type RevokeClientKeyV0 struct  {
-  content: RevokeClientKeyContentV0
+# Remove a client
+type DelClientV0 struct  {
+  content: DelClientContentV0
 
   # Signature by user key
   sig: Sig
 }
-type RevokeClientKey union { RevokeClientKeyV0 }
+type DelClient union { DelClientV0 }
 
 # Content of BrokerRequest
 type BrokerRequestContentV0 union {
   | AddUser | DelUser
-  | AuthorizeClientKey | RevokeClientKey
+  | AddClient | DelClient
 }
 
 # Broker request
@@ -876,10 +877,7 @@ type BlockGetV0 struct {
 type BlockGet union { BlockGetV0 }
 
 # Request to store a block
-type BlockPutV0 struct {
-  block: Block
-}
-type BlockPut union { BlockPutV0 }
+type BlockPut union { Block }
 
 # Request to pin an object
 #
@@ -922,7 +920,7 @@ type TopicSubV0 struct {
   # Topic to subscribe
   topic: PubKey
 
-  # Signed topic advert with the PeerId of the broker
+  # Signed TopicAdvert for the PeerId of the broker
   advert: optional<TopicAdvertV0>
 }
 type TopicSub union { TopicSubV0 }
@@ -1167,7 +1165,7 @@ type TopicV0 struct {
   # Topic public key ID
   id: PubKey
 
-  # Topic private key for publishers
+  # Signed TopicAdvert for publishers
   advert: optional<TopicAdvertV0>
 
   # Set of branch heads
@@ -1205,15 +1203,15 @@ type Overlay union { OverlayV0 }
 # Stored as user_pubkey -> Account
 type AccountV0 struct {
   # Authorized client pub keys
-  authorizedKeys: list<PubKey>
+  clients: list<PubKey>
 
   # Admins can add/remove user accounts
   admin: bool
 
   # Overlays joined
-  overlays: list<PubKey>
+  overlays: list<Overlay>
 
   # Topics joined, with publisher flag
-  topics: list<PubKey>
+  topics: list<Topic>
 }
 type Account union { AccountV0 }
