@@ -115,7 +115,7 @@ type BlockV0 struct {
 
   # Other objects this object depends on (e.g. Commit deps & acks)
   # only set for the root Block
-  deps: optional<ObjectDeps>
+  deps: ObjectDeps
 
   # Expiry time of this block and all of its children
   # when the block should be deleted by all replicas
