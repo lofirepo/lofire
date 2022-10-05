@@ -1079,8 +1079,8 @@ type ExtResponse union { ExtResponseV0 }
 type ClientHelloV0 void
 type ClientHello union { ClientHelloV0 }
 
-# Initiate connection - choose client or ext protocol
-# First message sent by the initiator for a new connection
+# Initiate connection - choose broker or ext protocol
+# First message sent by the client
 type InitConnection union { ClientHello | ExtRequest }
 
 # Server hello sent upon a client connection
@@ -1111,7 +1111,7 @@ type ClientAuth union { ClientAuthV0 }
 
 # Authentication result
 type AuthResultV0 struct {
-  result: Result
+  result: u16
 }
 type AuthResult union { AuthResultV0 }
 
@@ -1188,7 +1188,7 @@ type OverlayV0 struct {
   peers: list<PeerAdvert>
 
   # Topics this node subscribed to in the overlay
-  topics: list<Topic>
+  topics: list<TopicId>
 
   # Number of local users that joined the overlay
   users: u32
@@ -1209,9 +1209,9 @@ type AccountV0 struct {
   admin: bool
 
   # Overlays joined
-  overlays: list<Overlay>
+  overlays: list<OverlayId>
 
   # Topics joined, with publisher flag
-  topics: list<Topic>
+  topics: list<TopicId>
 }
 type Account union { AccountV0 }
