@@ -6,7 +6,7 @@
 type Blake3Digest32 data[32]
 
 # Hash digest
-type Digest union { Blake3Digest32 }
+type HashDigest union { Blake3Digest32 }
 
 # ChaCha20 key
 type ChaCha20Key data[32]
@@ -56,17 +56,17 @@ type RelTime union {
 ## STORAGE OBJECTS
 ##
 
-# Object ID
+# Block ID
 #
-# BLAKE3 hash over the serialized Object with encrypted content.
-type ObjectId Digest
+# BLAKE3 hash over the serialized Block with encrypted content.
+type BlockId HashDigest
 
-# Object reference
-type ObjectRef struct {
-  # Object ID
-  id: ObjectId
+# Block reference
+type BlockRef struct {
+  # Block ID
+  id: BlockId
 
-  # Key for decrypting the Object
+  # Key for decrypting the Block
   key: SymKey
 }
 
@@ -74,55 +74,55 @@ type ObjectRef struct {
 type InternalNode list<SymKey>
 
 # Data chunk at a leaf of a Merkle tree
-type DataChunk data
+type Chunk data
 
-# Content of an Object
-type ObjectContentV0 union {
+# Content of a Block
+type BlockContentV0 union {
   # Internal node with references to children
   | InternalNode
 
   # Leaf node with encrypted data chunk
-  | DataChunk
+  | Chunk
 }
 
-# List of ObjectId dependencies as encrypted Object content
+# List of BlockId dependencies as encrypted Block content
 type DepList union {
-  list<ObjectId>
+  list<BlockId>
 }
 
-# Dependencies of an Object
-type ObjectDeps union {
-  # List of Object IDs (max. 8),
-  | list<ObjectId>
+# Dependencies of a Block
+type BlockDeps union {
+  # List of Block IDs
+  | list<BlockId>
 
-  # Reference to an Object that contains a DepList
-  | ObjectRef
+  # Reference to an Block that contains a DepList
+  | BlockRef
 }
 
-# Immutable object with an encrypted chunk of data
+# Immutable block with an encrypted chunk of data
 #
 # Data is chunked and stored in a Merkle tree.
-type ObjectV0 struct {
-  # Objects IDs for child nodes in the Merkle tree
-  children: list<ObjectId>
+type BlockV0 struct {
+  # Block IDs for child nodes in the Merkle tree
+  children: list<BlockId>
 
-  # Other objects this object depends on (e.g. Commit deps & acks)
-  deps: ObjectDeps
+  # Other blocks this block depends on (e.g. Commit deps & acks)
+  deps: BlockDeps
 
-  # Expiry time of this object and all of its children
-  # when the object should be deleted by all replicas
+  # Expiry time of this block and all of its children
+  # when the block should be deleted by all replicas
   expiry: optional<Timestamp>
 
-  # Encrypted ObjectContentV0
+  # Encrypted BlockContentV0
   #
   # Encrypted using convergent encryption with ChaCha20:
   # - convergence_key: BLAKE3 derive_key ("LoFiRe Data BLAKE3 key",
   #                                       repo_pubkey + repo_secret)
-  # - key: BLAKE3 keyed hash (convergence_key, plain_object)
+  # - key: BLAKE3 keyed hash (convergence_key, plain_block)
   # - nonce: 0
   content: data
 }
-type Object union { ObjectV0 }
+type Block union { BlockV0 }
 
 # Repository definition
 #
@@ -135,7 +135,7 @@ type RepositoryV0 struct {
   id: PubKey
 
   # List of branches
-  branches: list<ObjectRef>
+  branches: list<BlockRef>
 
   # Whether or not to allow external requests
   allowExtRequests: bool
@@ -146,14 +146,14 @@ type RepositoryV0 struct {
 type Repository union { RepositoryV0 }
 
 # Add a branch to the repository
-type AddBranchV0 ObjectRef
+type AddBranchV0 BlockRef
 type AddBranch union { AddBranchV0 }
 
 # Remove a branch from the repository
-type RemoveBranchV0 ObjectRef
+type RemoveBranchV0 BlockRef
 type RemoveBranch union { RemoveBranchV0 }
 
-# Commit object types
+# Commit block types
 type CommitType enum {
   REPOSITORY ADD_BRANCH REMOVE_BRANCH
   BRANCH ADD_MEMBERS END_OF_BRANCH
@@ -168,7 +168,7 @@ type MemberV0 struct {
   # Commit types the member is allowed to publish in the branch
   commitTypes: list<CommitType>
 
-  # Application-specific metadata
+  # App-specific metadata
   # (role, permissions, cryptographic material, etc)
   metadata: data
 }
@@ -223,9 +223,9 @@ type AddMembersV0 struct {
 }
 type AddMembers union { AddMembersV0 }
 
-type PlainOrEncryptedObjectRef union {
-  | ObjectRef
-  | data       # Encrypted ObjectRef
+type PlainOrEncryptedBlockRef union {
+  | BlockRef
+  | data       # Encrypted BlockRef
 }
 
 # End of branch
@@ -235,7 +235,7 @@ type PlainOrEncryptedObjectRef union {
 # with possibly different members, permissions, validation rules.
 type EndOfBranchV0 struct {
   # (Encrypted) reference to forked branch (optional)
-  fork: optional<PlainOrEncryptedObjectRef>
+  fork: optional<PlainOrEncryptedBlockRef>
 
   # Expiry time when all commits in the branch should be deleted
   expiry: Timestamp
@@ -251,7 +251,7 @@ type Transaction union { TransactionV0 }
 # Contains a data structure computed from the commits at the specified head.
 type SnapshotV0 struct {
   # Branch heads the snapshot was made from
-  heads: list<ObjectId>
+  heads: list<BlockId>
 
   # Snapshot data structure
   content: data
@@ -279,28 +279,28 @@ type CommitContentV0 struct {
   seq: u32
 
   # Branch the commit belongs to
-  branch: ObjectRef
+  branch: BlockRef
 
   # Direct dependencies of this commit
-  deps: list<ObjectRef>
+  deps: list<BlockRef>
 
   # Not directly dependent heads to acknowledge
-  acks: list<ObjectRef>
+  acks: list<BlockRef>
 
   # Files the commit references
-  refs: list<ObjectRef>
+  refs: list<BlockRef>
 
   # App-specific metadata (commit message, creation time, etc)
   metadata: data
 
-  # Object with a CommitBody inside
-  body: ObjectRef
+  # Block with a CommitBody inside
+  body: BlockRef
 
-  # Expiry time of the body object
+  # Expiry time of the body block
   expiry: optional<Timestamp>
 }
 
-# Commit object
+# Commit Object
 #
 # Signed by branch key, or a member key authorized to publish this commit type.
 type CommitV0 struct {
@@ -311,7 +311,7 @@ type CommitV0 struct {
 }
 type Commit union { CommitV0 }
 
-# A file stored in an Object
+# File Object
 type FileV0 struct {
   contentType: data
   metadata: data
@@ -319,8 +319,8 @@ type FileV0 struct {
 }
 type File union { FileV0 }
 
-# Immutable data stored encrypted in a Merkle tree
-type Data union {
+# Immutable object stored in encrypted blocks of a Merkle tree
+type Object union {
   | Commit | CommitBody | File | DepList
 }
 
@@ -451,12 +451,12 @@ type UnsubAck union { UnsubAckV0 }
 #
 # Contains a chunk of a newly added Commit or File referenced by a commit.
 type ChangeV0 struct {
-  # Object with encrypted content
-  content: Object
+  # Block with encrypted content
+  content: Block
 
   # Encrypted key for the Commit object in content
   # The key is encrypted using ChaCha20:
-  # - key: BLAKE3 derive_key ("LoFiRe Event ObjectRef ChaCha20 key",
+  # - key: BLAKE3 derive_key ("LoFiRe Event BlockRef ChaCha20 key",
   #                           branch_pubkey + branch_secret + publisher_pubkey)
   # - nonce: commit_seq
   key: optional<SymKey>
@@ -478,7 +478,7 @@ type EventContentV0 struct {
   # - key: BLAKE3 derive_key ("LoFiRe Event publisher BLAKE3 key",
   #                           repo_pubkey + repo_secret +
   #                           branch_pubkey + branch_secret)
-  publisher: Digest
+  publisher: HashDigest
 
   # Commit sequence number of publisher
   seq: u32
@@ -498,32 +498,32 @@ type EventV0 struct {
 }
 type Event union { EventV0 }
 
-# Object search in a pub/sub topic
+# Block search in a pub/sub topic
 #
 # Sent along the reverse path of a pub/sub topic
 # from a subscriber to all publishers
-type ObjectSearchTopicV0 struct {
+type BlockSearchTopicV0 struct {
   # Topic to forward the request in
   topic: PubKey
 
-  # List of Object IDs to request
-  ids: list<ObjectId>
+  # List of Block IDs to request
+  ids: list<BlockId>
 
   # Whether or not to include all children recursively in the response
-  recursive: bool
+  includeChildren: bool
 
   # List of Peer IDs the request traversed so far
   path: list<PeerId>
 }
-type ObjectSearchTopic union { ObjectSearchTopicV0 }
+type BlockSearchTopic union { BlockSearchTopicV0 }
 
-# Object search along a random walk
-type ObjectSearchRandomV0 struct {
-  # List of Object IDs to request
-  ids: list<ObjectId>
+# Block search along a random walk
+type BlockSearchRandomV0 struct {
+  # List of Block IDs to request
+  ids: list<BlockId>
 
   # Whether or not to include all children recursively in the response
-  recursive: bool
+  includeChildren: bool
 
   # Number of random nodes to forward the request to at each step
   fanout: u8
@@ -531,19 +531,19 @@ type ObjectSearchRandomV0 struct {
   # List of Peer IDs the request traversed so far
   path: list<PeerId>
 }
-type ObjectSearchRandom union { ObjectSearchRandomV0 }
+type BlockSearchRandom union { BlockSearchRandomV0 }
 
-# Response to an Object request
+# Response to an Block request
 #
 # Follows request path with possible shortcuts.
-type ObjectResultV0 struct {
+type BlockResultV0 struct {
   # Response path
   path: list<PeerId>
 
-  # Resulting Object(s)
-  payload: list<Object>
+  # Resulting Block(s)
+  payload: list<Block>
 }
-type ObjectResult union { ObjectResultV0 }
+type BlockResult union { BlockResultV0 }
 
 # Request latest events corresponding to the branch heads in a pub/sub topic.
 #
@@ -554,20 +554,20 @@ type BranchHeadsReqV0 struct {
   topic: PubKey
 
   # Known heads
-  knownHeads: list<ObjectId>
+  knownHeads: list<BlockId>
 }
 type BranchHeadsReq union { BranchHeadsReqV0 }
 
 # Branch synchronization request
 #
-# In response a stream of Objects are sent
+# In response a stream of Blocks are sent
 # that are not present in the requestor's known heads and commits
 type BranchSyncReqV0 struct {
   # Heads to request, including all their dependencies
-  heads: list<ObjectId>
+  heads: list<BlockId>
 
   # Fully synchronized until these commits
-  knownHeads: list<ObjectId>
+  knownHeads: list<BlockId>
 
   # Known commit IDs since knownHeads
   knownCommits: BloomFilter
@@ -577,7 +577,7 @@ type BranchSyncReq union { BranchSyncReqV0 }
 # Events the requestor needs
 type NeedEventsV0 struct {
   # Publisher ID
-  publisher:  Digest
+  publisher: HashDigest
 
   # First sequence number to request
   from: u32
@@ -589,7 +589,7 @@ type NeedEventsV0 struct {
 # Events the responder has
 type HaveEventsV0 struct {
   # Publisher ID
-  publisher: Digest
+  publisher: HashDigest
 
   # First sequence number to send
   from: u32
@@ -637,7 +637,7 @@ type OverlayRequest union { OverlayRequestV0 }
 
 # Content of OverlayResponse
 type OverlayResponseContentV0 union {
-  | Object
+  | Block
   | EventResp
   | Event
 }
@@ -695,7 +695,7 @@ type PeerAdvert union { PeerAdvertV0 }
 # - for private overlays:
 #   BLAKE3 keyed hash over the repository public key
 #   - key: BLAKE3 derive_key ("LoFiRe OverlayId BLAKE3 key", repo_secret)
-type OverlayId Digest
+type OverlayId HashDigest
 
 # Overlay session ID
 #
@@ -710,7 +710,7 @@ type OverlayMessageContentV0 union {
   | SubReq | SubAck
   | UnsubReq | UnsubAck
   | Event
-  | ObjectSearchTopic | ObjectSearchRandom | ObjectResult
+  | BlockSearchTopic | BlockSearchRandom | BlockResult
   | OverlayRequest | OverlayResponse
 }
 
@@ -743,7 +743,7 @@ type OverlayMessageV0 struct {
   # BLAKE3 keyed hash over the encrypted content
   # - key:  BLAKE3 derive_key ("LoFiRe OverlayMessage BLAKE3 key",
   #                            overlay_secret + session_id)
-  mac: Digest
+  mac: HashDigest
 }
 type OverlayMessage union { OverlayMessageV0 }
 
@@ -811,32 +811,32 @@ type RevokeClientKeyV0 struct  {
 }
 type RevokeClientKey union { RevokeClientKeyV0 }
 
-# Content of AppRequest
-type AppRequestContentV0 union {
+# Content of BrokerRequest
+type BrokerRequestContentV0 union {
   | AddUser | DelUser
   | AuthorizeClientKey | RevokeClientKey
 }
 
-# Application request
-type AppRequestV0 struct {
+# Broker request
+type BrokerRequestV0 struct {
   # Request ID
   id: u64
 
   # Request content
-  content: AppRequestContentV0
+  content: BrokerRequestContentV0
 }
-type AppRequest union { AppRequestV0 }
+type BrokerRequest union { BrokerRequestV0 }
 
 
-# Response to an AppRequest
-type AppResponseV0 struct {
+# Response to an BrokerRequest
+type BrokerResponseV0 struct {
   # Request ID
   id: u64
 
   # Result (incl but not limited to Result)
   result: u16
 }
-type AppResponse union { AppResponseV0 }
+type BrokerResponse union { BrokerResponseV0 }
 
 # Request to join an overlay
 type OverlayJoinV0 struct {
@@ -853,24 +853,24 @@ type OverlayLeave union {
   void
 }
 
-# Request an object by ID
-type ObjectGetV0 struct {
-  # List of Object IDs to request
-  ids: list<ObjectId>
+# Request an block by ID
+type BlockGetV0 struct {
+  # List of Block IDs to request
+  ids: list<BlockId>
 
   # Whether or not to include all children recursively
   includeChildren: bool
 
-  # Topic the object is referenced from
+  # Topic the block is referenced from
   topic: optional<PubKey>
 }
-type ObjectGet union { ObjectGetV0 }
+type BlockGet union { BlockGetV0 }
 
-# Request to store an object
-type ObjectPutV0 struct {
-  object: Object
+# Request to store an block
+type BlockPutV0 struct {
+  block: Block
 }
-type ObjectPut union { ObjectPutV0 }
+type BlockPut union { BlockPutV0 }
 
 # Request to pin an object
 #
@@ -925,70 +925,70 @@ type TopicUnsubV0 struct {
 }
 type TopicUnsub union { TopicUnsubV0 }
 
-# Content of AppOverlayRequest
-type AppOverlayRequestContentV0 union {
+# Content of BrokerOverlayRequest
+type BrokerOverlayRequestContentV0 union {
   | OverlayJoin | OverlayLeave
   | TopicSub | TopicUnsub
   | Event
-  | ObjectGet | ObjectPut
+  | BlockGet | BlockPut
   | ObjectPin | ObjectUnpin
   | ObjectCopy | ObjectDel
   | BranchHeadsReq | BranchSyncReq
 }
 
-# Application overlay request
-type AppOverlayRequestV0 struct {
+# Broker overlay request
+type BrokerOverlayRequestV0 struct {
   # Request ID
   id: u64
 
   # Request content
-  content: AppOverlayRequestContentV0
+  content: BrokerOverlayRequestContentV0
 }
-type AppOverlayRequest union { AppOverlayRequestV0 }
+type BrokerOverlayRequest union { BrokerOverlayRequestV0 }
 
-# Content of AppOverlayResponseV0
-type AppOverlayResponseContentV0 union {
-  Object
+# Content of BrokerOverlayResponseV0
+type BrokerOverlayResponseContentV0 union {
+  Block
 }
 
-# Response to an AppOverlayRequest
-type AppOverlayResponseV0 struct {
+# Response to an BrokerOverlayRequest
+type BrokerOverlayResponseV0 struct {
   # Request ID
   id: u64
 
   # Result (incl but not limited to Result)
   result: u16
-  content: optional<AppOverlayResponseContentV0>
+  content: optional<BrokerOverlayResponseContentV0>
 }
-type AppOverlayResponse union { AppOverlayResponseV0 }
+type BrokerOverlayResponse union { BrokerOverlayResponseV0 }
 
-# Content of AppOverlayMessageV0
-type AppOverlayMessageContentV0 union {
-  | AppOverlayRequest | AppOverlayResponse
+# Content of BrokerOverlayMessageV0
+type BrokerOverlayMessageContentV0 union {
+  | BrokerOverlayRequest | BrokerOverlayResponse
   | Event
 }
 
-# Application message for an overlay
-type AppOverlayMessageV0 struct {
+# Message for an overlay
+type BrokerOverlayMessageV0 struct {
   overlay: OverlayId
-  content: AppOverlayMessageContentV0
+  content: BrokerOverlayMessageContentV0
 }
-type AppOverlayMessage union { AppOverlayMessageV0 }
+type BrokerOverlayMessage union { BrokerOverlayMessageV0 }
 
-# Content of AppMessage
-type AppMessageContentV0 union {
-  | AppRequest | AppResponse
-  | AppOverlayMessage
+# Content of BrokerMessage
+type BrokerMessageContentV0 union {
+  | BrokerRequest | BrokerResponse
+  | BrokerOverlayMessage
 }
 
-# Application message
-type AppMessageV0 struct {
-  content: AppMessageContentV0
+# Broker message
+type BrokerMessageV0 struct {
+  content: BrokerMessageContentV0
 
   # Optional padding
   padding: data
 }
-type AppMessage union { AppMessageV0 }
+type BrokerMessage union { BrokerMessageV0 }
 
 ##
 ## EXTERNAL REQUESTS
@@ -999,7 +999,7 @@ type AppMessage union { AppMessageV0 }
 # The request is sent by a non-member to an overlay member node,
 # which has a replica of the repository.
 #
-# The response includes the requested objects and all their children recursively,
+# The response includes all blocks of the requested objects,
 # and optionally all object dependencies recursively.
 type ExtObjectGetV0 struct {
   # Repository to request the objects from
@@ -1008,8 +1008,8 @@ type ExtObjectGetV0 struct {
   # List of Object IDs to request, including their children
   ids: list<ObjectId>
 
-  # Whether or not to include all children recursively
-  includeChildren: bool
+  # Whether or not to include object dependencies
+  includeDeps: bool
 
   # Expiry time after which the link becomes invalid
   expiry: optional<Timestamp>
@@ -1041,13 +1041,13 @@ type ExtRequestV0 struct {
   # BLAKE3 keyed hash:
   # - key: BLAKE3 derive_key ("LoFiRe ExtRequest BLAKE3 key",
   #                           repo_pubkey + repo_secret)      # FIXME
-  mac: Digest
+  mac: HashDigest
 }
 type ExtRequest union { ExtRequestV0 }
 
 # Content of ExtResponseV0
 type ExtResponseContentV0 union {
-  | Object
+  | Block
   | EventResp
   | Event
 }
@@ -1144,8 +1144,8 @@ type ObjectLinkV0 struct {
   # Request to send to an overlay peer
   req: ExtRequest
 
-  # Keys for the requested objects
-  keys: list<ObjectRef>
+  # Keys for the root blocks of the requested objects
+  keys: list<BlockRef>
 }
 type ObjectLink union { ObjectLinkV0 }
 
@@ -1162,7 +1162,7 @@ type TopicV0 struct {
   advert: optional<TopicAdvertV0>
 
   # Set of branch heads
-  heads: list<ObjectId>
+  heads: list<BlockId>
 
   # Number of local users that subscribed to the topic
   users: u32
