@@ -339,6 +339,21 @@ type ObjectContent union {
 # Peer ID
 type PeerId PubKey
 
+# Overlay ID
+#
+# - for public overlays that need to be discovered by public key:
+#   BLAKE3 hash over the repository public key
+# - for private overlays:
+#   BLAKE3 keyed hash over the repository public key
+#   - key: BLAKE3 derive_key ("LoFiRe OverlayId BLAKE3 key", repo_secret)
+type OverlayId Digest
+
+# Overlay session ID
+#
+# Used as a component for key derivation.
+# Each peer generates it randomly when (re)joining the overlay network.
+type SessionId u64
+
 # Result code
 type Result enum { OK ERROR }
 
@@ -463,6 +478,7 @@ type ChangeV0 struct {
   content: Block
 
   # Encrypted key for the Commit object in content
+  # Only set for the root block of the object
   # The key is encrypted using ChaCha20:
   # - key: BLAKE3 derive_key ("LoFiRe Event ObjectRef ChaCha20 key",
   #                           branch_pubkey + branch_secret + publisher_pubkey)
@@ -541,7 +557,7 @@ type BlockSearchRandomV0 struct {
 }
 type BlockSearchRandom union { BlockSearchRandomV0 }
 
-# Response to an Block request
+# Response to a Block request
 #
 # Follows request path with possible shortcuts.
 type BlockResultV0 struct {
@@ -696,21 +712,6 @@ type PeerAdvertV0 struct {
 }
 type PeerAdvert union { PeerAdvertV0 }
 
-# Overlay ID
-#
-# - for public overlays that need to be discovered by public key:
-#   BLAKE3 hash over the repository public key
-# - for private overlays:
-#   BLAKE3 keyed hash over the repository public key
-#   - key: BLAKE3 derive_key ("LoFiRe OverlayId BLAKE3 key", repo_secret)
-type OverlayId Digest
-
-# Overlay session ID
-#
-# Used as a component for key derivation.
-# Each peer generates it randomly when (re)joining the overlay network.
-type SessionId u64
-
 # Content of OverlayMessageContentPaddedV0
 type OverlayMessageContentV0 union {
   | OverlayConnect | OverlayDisconnect
@@ -861,7 +862,7 @@ type OverlayLeave union {
   void
 }
 
-# Request an block by ID
+# Request a block by ID
 type BlockGetV0 struct {
   # List of ObjectIds to request
   ids: list<ObjectId>
@@ -874,7 +875,7 @@ type BlockGetV0 struct {
 }
 type BlockGet union { BlockGetV0 }
 
-# Request to store an block
+# Request to store a block
 type BlockPutV0 struct {
   block: Block
 }
