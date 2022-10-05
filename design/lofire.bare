@@ -747,32 +747,6 @@ type OverlayMessage union { OverlayMessageV0 }
 ## BROKER MESSAGES
 ##
 
-# Server hello sent upon a client connection
-type ServerHelloV0 struct {
-  # Nonce for ClientAuth
-  nonce: data
-}
-type ServerHello union { ServerHelloV0 }
-
-# Client authentication
-type ClientAuthV0 struct {
-  # Authentication data
-  content: struct {
-    # User pub key
-    user: PubKey
-
-    # Client pub key
-    client: PubKey
-
-    # Nonce from ServerHello
-    nonce: data
-  }
-
-  # Signature by device key
-  sig: Signature
-}
-type ClientAuth union { ClientAuthV0 }
-
 # Content of AddUserV0
 type AddUserContentV0 struct {
   # User pub key
@@ -920,8 +894,8 @@ type TopicUnsubV0 struct {
 }
 type TopicUnsub union { TopicUnsubV0 }
 
-# Content of AppRequest
-type AppRequestContentV0 union {
+# Content of AppOverlayRequest
+type AppOverlayRequestContentV0 union {
   | OverlayJoin | OverlayLeave
   | TopicSub | TopicUnsub
   | Event
@@ -932,37 +906,37 @@ type AppRequestContentV0 union {
 }
 
 # Application request
-type AppRequestV0 struct {
+type AppOverlayRequestV0 struct {
   # Request ID
   id: u64
 
   # Request content
-  content: AppRequestContentV0
+  content: AppOverlayRequestContentV0
 }
-type AppRequest union { AppRequestV0 }
+type AppOverlayRequest union { AppOverlayRequestV0 }
 
 # Result codes
 type Result enum { OK ERROR }
 
-# Content of AppResponseV0
-type AppResponseContentV0 union {
+# Content of AppOverlayResponseV0
+type AppOverlayResponseContentV0 union {
   Object
 }
 
-# Response to an AppRequest
-type AppResponseV0 struct {
+# Response to an AppOverlayRequest
+type AppOverlayResponseV0 struct {
   # Request ID
   id: u64
 
   # Result (incl but not limited to Result)
   result: u16
-  content: optional<AppResponseContentV0>
+  content: optional<AppOverlayResponseContentV0>
 }
-type AppResponse union { AppResponseV0 }
+type AppOverlayResponse union { AppOverlayResponseV0 }
 
 # Content of AppOverlayMessageV0
 type AppOverlayMessageContentV0 union {
-  | AppRequest | AppResponse
+  | AppOverlayRequest | AppOverlayResponse
   | Event
 }
 
@@ -1066,6 +1040,49 @@ type ExtResponseV0 struct {
 type ExtResponse union { ExtResponseV0 }
 
 ##
+## AUTHENTICATION MESSAGES
+##
+
+type ClientHelloV0 void
+type ClientHello union { ClientHelloV0 }
+
+# Initiate connection - choose client or ext protocol
+# First message sent by the initiator for a new connection
+type InitConnection union { ClientHello ExtRequest }
+
+# Server hello sent upon a client connection
+type ServerHelloV0 struct {
+  # Nonce for ClientAuth
+  nonce: data
+}
+type ServerHello union { ServerHelloV0 }
+
+# Client authentication
+type ClientAuthV0 struct {
+  # Authentication data
+  content: struct {
+    # User pub key
+    user: PubKey
+
+    # Client pub key
+    client: PubKey
+
+    # Nonce from ServerHello
+    nonce: data
+  }
+
+  # Signature by client key
+  sig: Signature
+}
+type ClientAuth union { ClientAuthV0 }
+
+# Authentication result
+type AuthResultV0 struct {
+  result: Result
+}
+type AuthResult union { AuthResultV0 }
+
+##
 ## DIRECT MESSAGES
 ##
 
@@ -1159,9 +1176,9 @@ type AccountV0 struct {
   admin: bool
 
   # Overlays joined
-  overlays: list<Overlay>
+  overlays: list<PubKey>
 
   # Topics joined, with publisher flag
-  topics: list<Topic>
+  topics: list<PubKey>
 }
 type Account union { AccountV0 }
