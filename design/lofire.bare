@@ -6,7 +6,7 @@
 type Blake3Digest32 data[32]
 
 # Hash digest
-type HashDigest union { Blake3Digest32 }
+type Digest union { Blake3Digest32 }
 
 # ChaCha20 key
 type ChaCha20Key data[32]
@@ -59,7 +59,7 @@ type RelTime union {
 # Block ID
 #
 # BLAKE3 hash over the serialized Block with encrypted content.
-type BlockId HashDigest
+type BlockId Digest
 
 # Block reference
 type BlockRef struct {
@@ -315,7 +315,7 @@ type CommitV0 struct {
   content: CommitContentV0
 
   # Signature over the content by the author
-  sig: Signature
+  sig: Sig
 }
 type Commit union { CommitV0 }
 
@@ -410,7 +410,7 @@ type TopicAdvertV0 struct {
   content: TopicAdvertContentV0
 
   # Signature over content by topic key
-  sig: Signature
+  sig: Sig
 }
 type TopicAdvert union { TopicAdvertV0 }
 
@@ -486,7 +486,7 @@ type EventContentV0 struct {
   # - key: BLAKE3 derive_key ("LoFiRe Event publisher BLAKE3 key",
   #                           repo_pubkey + repo_secret +
   #                           branch_pubkey + branch_secret)
-  publisher: HashDigest
+  publisher: Digest
 
   # Commit sequence number of publisher
   seq: u32
@@ -502,7 +502,7 @@ type EventV0 struct {
   content: EventContentV0
 
   # Signature over content by topic key
-  sig: Signature
+  sig: Sig
 }
 type Event union { EventV0 }
 
@@ -585,7 +585,7 @@ type BranchSyncReq union { BranchSyncReqV0 }
 # Events the requestor needs
 type NeedEventsV0 struct {
   # Publisher ID
-  publisher: HashDigest
+  publisher: Digest
 
   # First sequence number to request
   from: u32
@@ -597,7 +597,7 @@ type NeedEventsV0 struct {
 # Events the responder has
 type HaveEventsV0 struct {
   # Publisher ID
-  publisher: HashDigest
+  publisher: Digest
 
   # First sequence number to send
   from: u32
@@ -689,7 +689,7 @@ type PeerAdvertV0 struct {
   content: PeerAdvertContentV0
 
   # Signature over content by peer's private key
-  sig: Signature
+  sig: Sig
 
   # Time-to-live, decremented at each hop
   ttl: u8
@@ -703,7 +703,7 @@ type PeerAdvert union { PeerAdvertV0 }
 # - for private overlays:
 #   BLAKE3 keyed hash over the repository public key
 #   - key: BLAKE3 derive_key ("LoFiRe OverlayId BLAKE3 key", repo_secret)
-type OverlayId HashDigest
+type OverlayId Digest
 
 # Overlay session ID
 #
@@ -751,7 +751,7 @@ type OverlayMessageV0 struct {
   # BLAKE3 keyed hash over the encrypted content
   # - key:  BLAKE3 derive_key ("LoFiRe OverlayMessage BLAKE3 key",
   #                            overlay_secret + session_id)
-  mac: HashDigest
+  mac: Digest
 }
 type OverlayMessage union { OverlayMessageV0 }
 
@@ -770,7 +770,7 @@ type AddUserV0 struct {
   content: AddUserContentV0
 
   # Signature by admin key
-  sig: Signature
+  sig: Sig
 }
 type AddUser union { AddUserV0 }
 
@@ -785,7 +785,7 @@ type DelUserV0 struct {
   content: DelUserContentV0
 
   # Signature by admin key
-  sig: Signature
+  sig: Sig
 }
 type DelUser union { DelUserV0 }
 
@@ -800,7 +800,7 @@ type AuthorizeClientKeyV0 struct {
   content: AuthorizeClientKeyContentV0
 
   # Signature by user key
-  sig: Signature
+  sig: Sig
 }
 type AuthorizeClientKey union { AuthorizeClientKeyV0 }
 
@@ -815,7 +815,7 @@ type RevokeClientKeyV0 struct  {
   content: RevokeClientKeyContentV0
 
   # Signature by user key
-  sig: Signature
+  sig: Sig
 }
 type RevokeClientKey union { RevokeClientKeyV0 }
 
@@ -1049,7 +1049,7 @@ type ExtRequestV0 struct {
   # BLAKE3 keyed hash:
   # - key: BLAKE3 derive_key ("LoFiRe ExtRequest BLAKE3 key",
   #                           repo_pubkey + repo_secret)      # FIXME
-  mac: HashDigest
+  mac: Digest
 }
 type ExtRequest union { ExtRequestV0 }
 
@@ -1106,7 +1106,7 @@ type ClientAuthV0 struct {
   }
 
   # Signature by client key
-  sig: Signature
+  sig: Sig
 }
 type ClientAuth union { ClientAuthV0 }
 
