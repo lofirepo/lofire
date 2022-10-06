@@ -856,6 +856,14 @@ type OverlayJoinV0 struct {
   # Overlay secret
   secret: SymKey
 
+  # Public key for the repository the overlay belongs to.
+  # Only set for local brokers.
+  repoPubKey: Option<PubKey>,
+
+  # Secret for the repository.
+  # Only set for local brokers.
+  repoSecret: Option<SymKey>,
+
   # Peers to connect to
   peers: list<PeerAdvert>
 }
