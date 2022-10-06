@@ -30,7 +30,7 @@ type PrivKey union { Curve25519PrivKey }
 type Ed25519Sig data[64]
 
 # Cryptographic signature
-type Signature union { Ed25519Sig }
+type Sig union { Ed25519Sig }
 
 # Timestamp: absolute time in minutes since 2022-02-22 22:22 UTC
 type Timestamp u32
@@ -316,7 +316,7 @@ type CommitV0 struct {
   content: CommitContentV0
 
   # Signature over the content by the author
-  sig: Sig
+   sig: Sig
 }
 type Commit union { CommitV0 }
 
@@ -354,6 +354,9 @@ type OverlayId Digest
 # Used as a component for key derivation.
 # Each peer generates it randomly when (re)joining the overlay network.
 type SessionId u64
+
+# Topic ID
+type TopicId PubKey
 
 # Result code
 type Result enum { OK ERROR }
@@ -843,7 +846,7 @@ type BrokerResponseV0 struct {
   # Request ID
   id: u64
 
-  # Result (incl but not limited to Result)
+  # Result (including but not limited to Result)
   result: u16
 }
 type BrokerResponse union { BrokerResponseV0 }
@@ -915,12 +918,11 @@ type ObjectDelV0 struct {
 type ObjectDel union { ObjectDelV0 }
 
 # Request subscription to a topic
-# For publishers a signed topic
 type TopicSubV0 struct {
   # Topic to subscribe
   topic: PubKey
 
-  # Signed TopicAdvert for the PeerId of the broker
+  # Publishers need to include a signed TopicAdvert for the PeerId of the broker
   advert: optional<TopicAdvertV0>
 }
 type TopicSub union { TopicSubV0 }
@@ -932,10 +934,25 @@ type TopicUnsubV0 struct {
 }
 type TopicUnsub union { TopicUnsubV0 }
 
+# Connect to an already subscribed topic, and start receiving its Events
+type TopicConnectV0 struct {
+  # Topic to connect
+  topic: PubKey
+}
+type TopicConnect union { TopicConnectV0 }
+
+# Disconnect from a topic and stop receiving its Events
+type TopicDisconnectV0 struct {
+  # Topic to disconnect
+  topic: PubKey
+}
+type TopicDisconnect union { TopicDisconnectV0 }
+
 # Content of BrokerOverlayRequest
 type BrokerOverlayRequestContentV0 union {
   | OverlayJoin | OverlayLeave
   | TopicSub | TopicUnsub
+  | TopicConnect | TopicDisconnect
   | Event
   | BlockGet | BlockPut
   | ObjectPin | ObjectUnpin
@@ -963,7 +980,7 @@ type BrokerOverlayResponseV0 struct {
   # Request ID
   id: u64
 
-  # Result (incl but not limited to Result)
+  # Result (including but not limited to Result)
   result: u16
   content: optional<BrokerOverlayResponseContentV0>
 }
