@@ -1136,7 +1136,11 @@ type ClientAuth union { ClientAuthV0 }
 
 # Authentication result
 type AuthResultV0 struct {
+  # Authentication result (Ok/Error)
   result: u16
+
+  # Authentication token for HTTP
+  token: data
 }
 type AuthResult union { AuthResultV0 }
 

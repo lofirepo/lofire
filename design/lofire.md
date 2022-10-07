@@ -521,7 +521,7 @@ by exchanging branch heads and a Bloom filter of known commits since the last sy
 
 ### Block requests
 
-Blocks requests either follow the reverse path of a pub/sub topic from a subscriber to publishers (`BlockSearchTopic`), or a random walk (`BlockSearchRandom`).
+Block requests either follow the reverse path of a pub/sub topic from a subscriber to publishers (`BlockSearchTopic`), or a random walk (`BlockSearchRandom`).
 The response (`BlockResponse`) contains one or more objects,
 and are sent either directly to the requesting node, or along the reverse path of the request.
 
@@ -542,13 +542,23 @@ The broker provides access to its authorized clients to the pub/sub network and 
 Applications use it to connect to their local edge node,
 while edge nodes use it to connect to a core node,
 and perform local-first processing on application requests:
-if the local can answer the application request it does so,
+if the local node can answer the application request it does so,
 otherwise forwards the query to its configured broker in the core network,
 and/or sends the query to the edge network.
 In case a local node is not available,
 applications can talk directly to a broker in the core network.
 
-The broker protocol allows applications to request brokers to
+Brokers running locally on an edge node have access to cryptographic keys
+to decrypt and process repository contents, while core nodes do not.
+This allows local nodes to decrypt and validate incoming commits,
+and to decrypt and assemble object contents from blocks in order to serve client requests.
+
+The broker protocol is available via WebSocket over TLS.
+It requires authentication, which is initiated by the client using the `ClientHello` message,
+and finishes with an `AuthResult`.
+
+After successful authentication,
+it and allows clients to request brokers to
 join & leave an overlay (`OverlayJoin` & `OverlayLeave`) ,
 subscribe to & unsubscribe from topics (`TopicSub` & `TopicUnsub`),
 publish & receive events (`Event`),
@@ -558,6 +568,9 @@ download & upload blocks (`BlockGet` & `BlockPut`),
 pin objects for permanent storage (`ObjectPin`),
 copy objects with a different expiry time before sharing (`ObjectCopy`),
 and delete objects from storage (`ObjectDel`).
+
+The broker provides an interface to the object store via HTTP over TLS.
+HTTP requests require an authentication token which is returned in `AuthResult` by the broker protocol.
 
 ### External requests
 
