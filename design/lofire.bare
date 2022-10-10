@@ -1140,7 +1140,7 @@ type AuthResultV0 struct {
   result: u16
 
   # Authentication token for HTTP
-  token: data
+  token: Option<data>
 }
 type AuthResult union { AuthResultV0 }
 
