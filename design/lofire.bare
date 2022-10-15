@@ -129,7 +129,7 @@ type BlockV0 struct {
   #                                       repo_pubkey + repo_secret)
   # - key: BLAKE3 keyed hash (convergence_key, plain_block)
   # - nonce: 0
-  content: data
+  content: data # BlockContentV0
 }
 type Block union { BlockV0 }
 
@@ -484,10 +484,11 @@ type ChangeV0 struct {
   # Encrypted key for the Commit object in content
   # Only set for the root block of the object
   # The key is encrypted using ChaCha20:
-  # - key: BLAKE3 derive_key ("LoFiRe Event ObjectRef ChaCha20 key",
+  # - key: BLAKE3 derive_key ("LoFiRe Change Object ChaCha20 key",
+  #                           repo_pubkey + repo_secret +
   #                           branch_pubkey + branch_secret + publisher_pubkey)
   # - nonce: commit_seq
-  key: optional<SymKey>
+  key: optional<data[32]> # SymKey
 }
 type Change union { ChangeV0 }
 
@@ -501,12 +502,11 @@ type EventContentV0 struct {
   # Pub/sub topic
   topic: PubKey
 
-  # Publisher pubkey hash
-  # BLAKE3 keyed hash over branch member pubkey
-  # - key: BLAKE3 derive_key ("LoFiRe Event publisher BLAKE3 key",
+  # Publisher pubkey encrypted with ChaCha20:
+  # - key: BLAKE3 derive_key ("LoFiRe Event Publisher ChaCha20 key",
   #                           repo_pubkey + repo_secret +
   #                           branch_pubkey + branch_secret)
-  publisher: Digest
+  publisher: data[32] # PubKey
 
   # Commit sequence number of publisher
   seq: u32
@@ -750,11 +750,11 @@ type OverlayMessageV0 struct {
   # - key: BLAKE3 derive_key ("LoFiRe OverlayMessage ChaCha20 key",
   #                           overlay_secret + session_id)
   # - nonce: per-session message sequence number of sending peer
-  content: OverlayMessageContentPaddedV0
+  content: data # OverlayMessageContentPaddedV0
 
   # BLAKE3 MAC
   # BLAKE3 keyed hash over the encrypted content
-  # - key:  BLAKE3 derive_key ("LoFiRe OverlayMessage BLAKE3 key",
+  # - key: BLAKE3 derive_key ("LoFiRe OverlayMessage BLAKE3 key",
   #                            overlay_secret + session_id)
   mac: Digest
 }
@@ -876,8 +876,8 @@ type OverlayLeave union {
 
 # Request a block by ID
 type BlockGetV0 struct {
-  # List of ObjectIds to request
-  ids: list<ObjectId>
+  # Block ID to request
+  id: BlockId
 
   # Whether or not to include all children recursively
   includeChildren: bool
@@ -1106,7 +1106,7 @@ type ClientHello union { ClientHelloV0 }
 
 # Initiate connection - choose broker or ext protocol
 # First message sent by the client
-type InitConnection union { ClientHello | ExtRequest }
+type StartProtocol union { ClientHello | ExtRequest }
 
 # Server hello sent upon a client connection
 type ServerHelloV0 struct {
