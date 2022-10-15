@@ -857,12 +857,8 @@ type OverlayJoinV0 struct {
   secret: SymKey
 
   # Public key for the repository the overlay belongs to.
-  # Only set for local brokers.
+  # Mandatory for local brokers.
   repoPubKey: Option<PubKey>,
-
-  # Secret for the repository.
-  # Only set for local brokers.
-  repoSecret: Option<SymKey>,
 
   # Peers to connect to
   peers: list<PeerAdvert>
@@ -873,6 +869,16 @@ type OverlayJoin union { OverlayJoinV0 }
 type OverlayLeave union {
   void
 }
+
+# Request to join an overlay
+type OverlayStatusV0 struct {
+  # Whether or not the broker has joined the overlay
+  joined: bool
+
+  # List of peers currently connected in the overlay
+  peers: list<PeerAdvert>
+}
+type OverlayStatus union { OverlayStatusV0 }
 
 # Request a block by ID
 type BlockGetV0 struct {
@@ -958,7 +964,7 @@ type TopicDisconnect union { TopicDisconnectV0 }
 
 # Content of BrokerOverlayRequest
 type BrokerOverlayRequestContentV0 union {
-  | OverlayJoin | OverlayLeave
+  | OverlayStatus | OverlayJoin | OverlayLeave
   | TopicSub | TopicUnsub
   | TopicConnect | TopicDisconnect
   | Event
@@ -1239,8 +1245,5 @@ type AccountV0 struct {
 
   # Overlays joined
   overlays: list<OverlayId>
-
-  # Topics joined, with publisher flag
-  topics: list<TopicId>
 }
 type Account union { AccountV0 }
