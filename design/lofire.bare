@@ -858,7 +858,7 @@ type OverlayJoinV0 struct {
 
   # Public key for the repository the overlay belongs to.
   # Mandatory for local brokers.
-  repoPubKey: Option<PubKey>,
+  repoPubKey: optional<PubKey>
 
   # Peers to connect to
   peers: list<PeerAdvert>
@@ -870,15 +870,20 @@ type OverlayLeave union {
   void
 }
 
-# Request to join an overlay
-type OverlayStatusV0 struct {
+# Overlay status request
+type OverlayStatusReq union {
+  void
+}
+
+# Overlay status response
+type OverlayStatusRespV0 struct {
   # Whether or not the broker has joined the overlay
   joined: bool
 
   # List of peers currently connected in the overlay
   peers: list<PeerAdvert>
 }
-type OverlayStatus union { OverlayStatusV0 }
+type OverlayStatusResp union { OverlayStatusRespV0 }
 
 # Request a block by ID
 type BlockGetV0 struct {
@@ -964,7 +969,7 @@ type TopicDisconnect union { TopicDisconnectV0 }
 
 # Content of BrokerOverlayRequest
 type BrokerOverlayRequestContentV0 union {
-  | OverlayStatus | OverlayJoin | OverlayLeave
+  | OverlayStatusReq | OverlayJoin | OverlayLeave
   | TopicSub | TopicUnsub
   | TopicConnect | TopicDisconnect
   | Event
@@ -986,7 +991,9 @@ type BrokerOverlayRequest union { BrokerOverlayRequestV0 }
 
 # Content of BrokerOverlayResponseV0
 type BrokerOverlayResponseContentV0 union {
-  Block
+  | Block
+  | ObjectId
+  | OverlayStatusResp
 }
 
 # Response to an BrokerOverlayRequest
@@ -1146,7 +1153,7 @@ type AuthResultV0 struct {
   result: u16
 
   # Authentication token for HTTP
-  token: Option<data>
+  token: optional<data>
 }
 type AuthResult union { AuthResultV0 }
 
