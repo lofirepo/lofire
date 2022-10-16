@@ -8,21 +8,29 @@ bibliography: design/lofire.bib
 
 # Introduction
 
-LoFiRe is a decentralized, collaborative data repository
-with authentication, access control, and change validation.
-It is built on local-first data storage, synchronization,
-and change notification protocols
+LoFiRe is a decentralized, local-first [@local-first], end-to-end encrypted
+data repository and application platform
+with public key authentication, access control, and change validation,
+based on Conflict-free Replicated Data Types (CRDTs) [@cmrdts],
+and a two-tier peer-to-peer network
+that offers end-to-end encrypted object storage
+and asynchronous publish-subscribe (pub/sub) notifications.
+
+It is built on local-first data storage, synchronization, and change notification protocols
 that aim to protect privacy by minimizing metadata exposed to intermediaries.
 It enables local-first, asynchronous collaboration and data storage within communities
 while respecting privacy and maintaining data ownership,
 and provides foundations for developing local-first decentralized applications
 and community overlay protocols.
 
-Community members use local-first software [@local-first]
+Community members use local-first software
 to collaborate around a partition-tolerant, permissioned, tamper-proof data repository
-that contains Directed Acyclic Graphs (DAG) of causally related transactions
-with operations on Conflict-free Replicated Data Types (CRDTs) [@cmrdts].
-In other words, it is a permissioned, DAG-structured distributed ledger, or blockchain, with partially ordered CRDT transactions.
+that contains branches of Directed Acyclic Graphs (DAG)
+of causally related transactions with operations on CRDTs.
+
+In other words, a branch of the repository
+is a permissioned, DAG-structured distributed ledger, or blockchain,
+with partially ordered CRDT transactions.
 CRDTs require only a partial order on transactions,
 there's no need to determine a total order using a consensus protocol,
 which makes the protocol light-weight and low on resource use.

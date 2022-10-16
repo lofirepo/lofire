@@ -8,10 +8,15 @@ header-image-class: invert
 
 ## About
 
-LoFiRe is a
-[local-first](https://www.inkandswitch.com/local-first/)
-data repository for *collaborative decentralized applications*
-with the following properties:
+LoFiRe is a decentralized, local-first [@local-first], end-to-end encrypted
+data repository and application platform
+with public key authentication, access control, and change validation,
+based on Conflict-free Replicated Data Types (CRDTs) [@cmrdts],
+and a two-tier peer-to-peer (P2P) network
+that offers end-to-end encrypted object storage
+and asynchronous publish-subscribe (pub/sub) notifications.
+
+LoFiRe has the following properties:
 
 Data ownership and portability
 : Users own their data and have a local copy.
