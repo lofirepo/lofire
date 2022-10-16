@@ -695,7 +695,7 @@ type PeerAdvertContentV0 struct {
   address: list<NetAddr>
 
   # Version number
-  version: u16
+  version: u32
 
   # App-specific metadata (profile, cryptographic material, etc)
   metadata: data
