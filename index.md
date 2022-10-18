@@ -8,21 +8,34 @@ header-image-class: invert
 
 ## About
 
-LoFiRe is a decentralized, local-first [@local-first], end-to-end encrypted
-data repository and application platform
-with public key authentication, access control, and change validation,
-based on Conflict-free Replicated Data Types (CRDTs) [@cmrdts],
-and a two-tier peer-to-peer (P2P) network
-that offers end-to-end encrypted object storage
-and asynchronous publish-subscribe (pub/sub) notifications.
+LoFiRe is a decentralized, [local-first](https://www.inkandswitch.com/local-first/)
+application platform built on *local-first data repositories* and a *local-first network architecture*.
 
-LoFiRe has the following properties:
+Local-First Repositories
+: Data repositories offer end-to-end encrypted data storage
+  with public key authentication, access control, and change validation
+  based on [Conflict-free Replicated Data Types](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) (CRDTs) and immutable [Directed Acyclic Graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG) with cryptographic authentication of commits.
+
+Local-First Network
+: The two-tier, asynchronous peer-to-peer (P2P) network consists of a core and edge networks,
+  and offers end-to-end encrypted object storage,
+  as well as asynchronous, end-to-end encrypted publish-subscribe (pub/sub) change notifications
+  with location privacy for end-user devices.
+
+Local-First Applications
+: Applications use local-first repositories and local-first networking
+  to enable private & secure collaboration for groups and individual users,
+  with multi-device synchronization of application data.
+
+LoFiRe offers:
 
 Data ownership and portability
 : Users own their data and have a local copy.
 
 Self-Sovereign Identities
-: Users control their identities, and have the choice to use their already existing public key identities or create new identities for each repository.
+: Users control their identities,
+  and have the choice to use their already existing public key identities
+  or create new identities for each repository.
 
 End-to-end encryption
 : Data in the repository is stored end-to-end encrypted.
@@ -41,14 +54,15 @@ Asynchronicity
   even if they are not online at the same time or work offline.
 
 Controlled data locality
-: Each repository is replicated within a private network composed only of community member's devices and their authorized replicas.
+: Each repository is replicated within a private network
+  composed only of community member's devices and their authorized replicas.
 
 Multiple devices per user
 : Data is available and synchronized on multiple user devices.
 
 ## Applications
 
-LoFiRe can be used by local-first decentralized applications
+LoFiRe offers a end-to-end encrypted storage and asynchronous change notifications local-first decentralized applications
 that use [Conflict-free Replicated Data Types](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) (CRDTs) as their data model.
 It is designed to support collaboration within communities and organizations.
 It does not depend on any specific blockchain, does not have a token, and it can synchronize its membership from external sources.

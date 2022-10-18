@@ -8,15 +8,18 @@ bibliography: design/lofire.bib
 
 # Introduction
 
-LoFiRe is a decentralized, local-first [@local-first], end-to-end encrypted
-data repository and application platform
+LoFiRe is a decentralized, local-first [@local-first] application platform
+built on *local-first data repositories* and a *local-first network architecture*.
+Data repositories offer end-to-end encrypted data storage
 with public key authentication, access control, and change validation,
 based on Conflict-free Replicated Data Types (CRDTs) [@cmrdts],
-and a two-tier peer-to-peer network
-that offers end-to-end encrypted object storage
-and asynchronous publish-subscribe (pub/sub) notifications.
+and immutable Directed Acyclic Graphs (DAG) with cryptographic authentication of commits.
+The two-tier, asynchronous peer-to-peer network consists of a core and edge networks,
+and offers end-to-end encrypted object storage,
+as well as asynchronous, end-to-end encrypted publish-subscribe (pub/sub) notifications
+with location privacy for end-user devices.
 
-It is built on local-first data storage, synchronization, and change notification protocols
+LoFiRe is built on local-first data storage, synchronization, and change notification protocols
 that aim to protect privacy by minimizing metadata exposed to intermediaries.
 It enables local-first, asynchronous collaboration and data storage within communities
 while respecting privacy and maintaining data ownership,
