@@ -11,6 +11,8 @@ header-image-class: invert
 LoFiRe is a decentralized, [local-first](https://www.inkandswitch.com/local-first/)
 application platform built on *local-first data repositories* and a *local-first network architecture*.
 
+LoFiRe consists of the following components:
+
 Local-First Repositories
 : Data repositories offer end-to-end encrypted data storage
   with public key authentication, access control, and change validation
@@ -27,7 +29,7 @@ Local-First Applications
   to enable private & secure collaboration for groups and individual users,
   with multi-device synchronization of application data.
 
-LoFiRe offers:
+LoFiRe has the following properties:
 
 Data ownership and portability
 : Users own their data and have a local copy.
