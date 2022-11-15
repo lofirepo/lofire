@@ -2,7 +2,7 @@
 title: LoFiRe
 subtitle: Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks
 author: TG x Thoth
-date: July 2022 -- Initial design proposal & protocol specification
+date: Draft, updated Nov 2022 -- System Design & Protocol Specifications
 bibliography: design/lofire.bib
 ---
 
@@ -11,12 +11,14 @@ bibliography: design/lofire.bib
 LoFiRe is a decentralized, local-first [@local-first] application platform
 built on *local-first data repositories* and a *local-first network architecture*.
 Data repositories offer end-to-end encrypted data storage
-with public key authentication, access control, and change validation,
-based on Conflict-free Replicated Data Types (CRDTs) [@cmrdts],
-and immutable Directed Acyclic Graphs (DAG) with cryptographic authentication of commits.
-The two-tier, asynchronous peer-to-peer network consists of a core and edge networks,
-and offers end-to-end encrypted object storage,
-as well as asynchronous, end-to-end encrypted publish-subscribe (pub/sub) notifications
+with public key authentication, access control, and change validation.
+Repositories store operation-based Conflict-free Replicated Data Types (CRDTs) [@cmrdts]
+that are replicated with Byzantine Fault Tolerance & Strong Eventual Consistency guarantees [@crdt-bft].
+Transactions with operations are organized in Directed Acyclic Graphs (DAG) with cryptographic authentication.
+The asynchronous peer-to-peer network relies on Delay/Disruption Tolerant Networking (DTN)
+with a store-and-forward multicast message routing protocol.
+Nodes in the network rely on end-to-end encrypted object storage
+and end-to-end encrypted publish-subscribe (pub/sub) notifications
 with location privacy for end-user devices.
 
 LoFiRe is built on local-first data storage, synchronization, and change notification protocols
@@ -48,11 +50,12 @@ Each repository is synchronized within a private community overlay network
 that offers immutable block storage, data synchronization,
 and asynchronous publish-subscribe change notification services.
 
-The two-tier network architecture consists of a stable core network and ephemeral edge networks.
-On edge networks, edge nodes synchronize locally and directly between each other,
-while when communicating with remote participants, they connect to a core node
-that stores and forwards encrypted objects and change notifications for them,
-thus acting as a pub/sub broker and object store for the edge nodes.
+The two-tier network architecture consists of
+a stable core network with an overlay network for each repository with a low-latency P2P pub/sub protocol,
+and ephemeral edge networks that use Delay/Disruption Tolerant Networking protocols for synchronization.
+On edge networks, edge nodes can synchronize locally and directly between each other,
+and can also connect to designated core nodes that store and forwards encrypted objects and change notifications for them,
+with such a core node acting as a pub/sub broker and object store for edge nodes.
 
 The system is composed of the following components:
 
@@ -65,8 +68,8 @@ Network
 Applications
 : CRDT state machine & change validation.
 
-In the following we describe the repository and network components,
-and the application protocol for interacting with the system.
+In the following we describe the repository structure and network protocols,
+as well as the interfaces for applications to interact with the system.
 
 ## Requirements
 

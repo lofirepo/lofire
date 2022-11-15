@@ -97,13 +97,14 @@ that aim to protect privacy by minimizing metadata exposed to intermediaries.
 It enables local-first, asynchronous collaboration and data storage within communities
 while respecting privacy and maintaining data ownership,
 and provides foundations for developing local-first decentralized applications
-and community overlay protocols.
+and community overlay network protocols.
 
 Community members use [local-first software](https://www.inkandswitch.com/local-first/)
 to collaborate around a partition-tolerant, permissioned, tamper-proof data repository
 that contains [Directed Acyclic Graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG)
 of causally related transactions with operations on
-[Conflict-free Replicated Data Types](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) (CRDTs).
+[Conflict-free Replicated Data Types](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) (CRDTs)
+that are replicated with Byzantine Fault Tolerance & Strong Eventual Consistency guarantees.
 In other words, it is a permissioned, DAG-structured distributed ledger, or blockchain, with partially ordered CRDT transactions.
 CRDTs require only a partial order on transactions, there's no need to determine a total order using a consensus protocol,
 which makes the protocol efficient and light-weight.
@@ -118,11 +119,12 @@ Each repository is synchronized within a private community overlay network
 that offers immutable block storage, data synchronization,
 and asynchronous publish-subscribe change notification services.
 
-The two-tier network architecture consists of a stable core network and ephemeral edge networks.
-On edge networks, edge nodes synchronize locally and directly between each other,
-while when communicating with remote participants, they connect to a core node
-that stores and forwards encrypted objects and change notifications for them,
-thus acting as a pub/sub broker and object store for the edge nodes.
+The two-tier network architecture consists of
+a stable core network with an overlay network for each repository with a low-latency P2P pub/sub protocol,
+and ephemeral edge networks that use [Delay/Disruption Tolerant Networking](https://en.wikipedia.org/wiki/Delay-tolerant_networking) protocols for synchronization.
+On edge networks, edge nodes can synchronize locally and directly between each other,
+and can also connect to designated core nodes that store and forwards encrypted objects and change notifications for them,
+with such a core node acting as a pub/sub broker and object store for edge nodes.
 
 The system is composed of the following components:
 
