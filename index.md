@@ -190,6 +190,10 @@ These objects are referenced from the mutable store.
 
 [We accept donations](https://p2pcollab.net/donate) in order to be able to continue research & development of local-first protocols and applications.
 
+## Funding
+
+This project was funded through the [NGI0 Discovery Fund](https://nlnet.nl/discovery), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://ngi.eu/) programme, under the aegis of DG Communications Networks, Content and Technology under grant agreement No 825322.
+
 ## See also
 
 - [P2Pcollab](https://p2pcollab.net)
