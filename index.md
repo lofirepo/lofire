@@ -64,19 +64,15 @@ Multiple devices per user
 
 ## Applications
 
-LoFiRe offers a end-to-end encrypted storage and asynchronous change notifications local-first decentralized applications
+LoFiRe offers end-to-end encrypted storage and asynchronous change notifications local-first decentralized applications
 that use [Conflict-free Replicated Data Types](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) (CRDTs) as their data model.
-It is designed to support collaboration within communities and organizations.
-It does not depend on any specific blockchain, does not have a token, and it can synchronize its membership from external sources.
+It is designed to support collaboration within communities and organizations,
+and supports asynchronous workflows with synchronization over the internet,
+as well as various local network transports that do not require internet connectivity.
 
 Communities and organizations (including Decentralized Autonomous Organizations, DAOs)
 can use it to support secure and authenticated interaction of their members
 through wikis, knowledge bases, structured discussions and decision making tools.
-
-It supports Open Knowledge and Decentralized Science (DeSci) by providing infrastructure
-for collaboration around decentralized data repositories and knowledge bases
-that can be used to collaborate on research projects,
-as well as to share and publish research results and artifacts.
 
 Here's a selection of applications LoFiRe can be used for
 that we intend to develop once we're ready with the underlying infrastructure:
