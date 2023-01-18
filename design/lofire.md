@@ -178,6 +178,14 @@ User data is thus also visible to third-party service providers, which are neces
 Permission revocations are not final, i.e. new operations with past dependencies can show up that have to be undone by an admin by adding and undo entry to the DAG,
 which becomes problematic especially with multiple admins with diverging histories, and malicious nodes that can cause the history to grow indefinitely.
 
+Holochain has an agent-centric approach to collaboration that does not require total ordering. They implement this using per-user append-only logs (Source Chains)
+that are stored in an application-specific overlay using a validating DHT. The use of DHT reduces system availability and consistency in case of a partition,
+and requires trusting DHT nodes for correct validation, storage, and retrieval of transactions in users' Source Chains.
+The single-writer append-only logs do not allow the use of multiple devices per user,
+and the system fails to provide Strong Eventual Consistency, Byzantine Fault Tolerance, and partial ordering due to the lack of causal dependencies across user chains.
+The hosting system do not support end-to-end encryption by default, and do not allow controlled data locality as it relies on an open market of hosting providers,
+rather than users choosing which hosting providers they want to host their data at.
+
 In contrast, LoFiRe focuses on privacy, security, and composability.
 It stores user data end-to-end encrypted, supports object expiry and deletion,
 branch forking, and snapshots for compacting operations,
@@ -609,18 +617,20 @@ in the application protocol.
 
 # Future work
 
-As future work we intend to:
+As future work we intend to research, design, and develop:
 
-- Add a name system that allows repositories to define named references to branches, commits, and files,
+- Definition and execution of transaction validation rules.
+- A name system that allows repositories to define named references to branches, commits, and files,
   as well as allow users to define named references to repositories they subscribe to.
-- Specify a URI scheme that allows references to repositories, branches, commits, and files, either by ID or name.
-- Add external membership & authentication mechanisms that synchronize the repository membership with an external source
-- Describe a publishing workflow, starting from collaboration in a repository that results in published immutable artefacts.
-- Define collaborative editing and publishing of semantic graph data models.
-- Improve and optimize the pub/sub protocol to leverage subscription coverage and interest clustering.
-- Specify LAN protocols based on IP multicast for peer discovery and pub/sub.
-- Specify local-first search & discovery protocols that find information in locally stored data, in the community overlays, and in the global network.
-- Define additional synchronization methods, including synchronizing from a repository on the local file system (e.g. on a USB drive)
+- An URI scheme that allows references to repositories, branches, commits, and files, either by ID or name.
+- External membership & authentication mechanisms that synchronize the repository membership with an external source
+- A system for hosting providers with anonymous payments for hosting credits.
+- A publishing workflow, starting from collaboration in a repository that results in published immutable artefacts.
+- Further improvements and optimizations for the pub/sub protocol to leverage subscription coverage and interest clustering.
+- LAN protocols based on IP multicast for peer discovery and pub/sub.
+- Local-first search & discovery protocols that find information in locally stored data, in the community overlays, and in the global network.
+- Additional transport and synchronization methods, including Delay/Disruption Tolerant Networking (DTN) and local file systems (removable storage).
+- Storage and query of graph data models, semantic web data.
 
 # Data structures
 

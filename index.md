@@ -49,7 +49,7 @@ Permissions & Access control
 : Fine-grained permissions for write access to the repository.
 
 Tamperproof
-: Once a transaction is stored in a branch, it cannot be removed.
+: Once a transaction is acknowledged by a quorum, it cannot be removed.
 
 Asynchronicity
 : Allow collaboration between users,
