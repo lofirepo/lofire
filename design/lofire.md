@@ -178,11 +178,14 @@ User data is thus also visible to third-party service providers, which are neces
 Permission revocations are not final, i.e. new operations with past dependencies can show up that have to be undone by an admin by adding and undo entry to the DAG,
 which becomes problematic especially with multiple admins with diverging histories, and malicious nodes that can cause the history to grow indefinitely.
 
-Holochain has an agent-centric approach to collaboration that does not require total ordering. They implement this using per-user append-only logs (Source Chains)
-that are stored in an application-specific overlay using a validating DHT. The use of DHT reduces system availability and consistency in case of a partition,
-and requires trusting DHT nodes for correct validation, storage, and retrieval of transactions in users' Source Chains.
-The single-writer append-only logs do not allow the use of multiple devices per user,
-and the system fails to provide Strong Eventual Consistency, Byzantine Fault Tolerance, and partial ordering due to the lack of causal dependencies across user chains.
+Holochain [@holo-green] has an agent-centric approach to collaboration that does not require total ordering.
+It uses per-user append-only logs (Source Chains) that are stored in an application-specific overlay using a validating DHT,
+they cannot fork and do not allow the use of multiple devices per user.
+The single-tier overlay relies on synchronous communication between peers
+that requires connecting to a number of online peers to retrieve DHT records and send messages,
+and in case of a network partition certain DHT entries may become unavailable, and messages cannot be sent to offline peers.
+Data locality within an overlay is determined by the DHT algorithm and is not correlated with interest in that piece of data, and data deletion is not supported.
+It does not provide Strong Eventual Consistency, Byzantine Fault Tolerance, and partial ordering due to the lack of causal dependencies across user chains.
 The hosting system do not support end-to-end encryption by default, and do not allow controlled data locality as it relies on an open market of hosting providers,
 rather than users choosing which hosting providers they want to host their data at.
 
