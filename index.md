@@ -174,6 +174,12 @@ These objects are referenced from the mutable store.
 - [Protocol design & specifications](https://github.com/p2pcollab/lofire)
 - [Rust implementation](https://github.com/p2pcollab/lofire-rs)
 
+## Users
+
+Projects using LoFiRe:
+
+- [NextGraph](https://nextgraph.org)
+
 ## Contact
 
 - Email: [#@p2pcollab.net](mailto:#@p2pcollab.net)
