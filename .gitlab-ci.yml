@@ -8,7 +8,7 @@ pages:
   stage: deploy
   script:
     - apk update
-    - apk add wget make git graphviz py3-pip
+    - apk add wget make git graphviz py3-pip texlive-full texmf-dist texlive-xetex librsvg
     - pip install pandoc-include
     - git submodule update --init
     - make WEB=1
