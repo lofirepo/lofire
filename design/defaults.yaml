@@ -5,3 +5,6 @@ filters:
   - pandoc-include
   #- pandoc-sidenote
   - type: citeproc
+
+metadata:
+  pdf-link: true

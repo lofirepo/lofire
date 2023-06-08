@@ -1,4 +1,3 @@
-template: pub/tufte-pandoc-css/tufte.html5
 highlight-style: monochrome
 toc: true
 
@@ -9,3 +8,6 @@ metadata:
   author-prefix: by
   link-citations: true
   csl: pub/csl/acm-sig-proceedings-long-author-list.csl
+  documentclass: scrartcl
+  mainfont: TeX Gyre Pagella
+  sansfont: TeX Gyre Pagella
