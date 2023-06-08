@@ -15,8 +15,7 @@ with public key authentication, access control, and change validation.
 Repositories store operation-based Conflict-free Replicated Data Types (CRDTs) [@cmrdts]
 that are replicated with Byzantine Fault Tolerance & Strong Eventual Consistency guarantees [@crdt-bft].
 Transactions with operations are organized in Directed Acyclic Graphs (DAG) with cryptographic authentication.
-The asynchronous peer-to-peer network relies on Delay/Disruption Tolerant Networking (DTN)
-with a store-and-forward multicast message routing protocol.
+The asynchronous network relies on store-and-forward multicast communication that can be provided by either Peer-to-Peer (P2P) publish-subscribe (pub/sub), Delay/Disruption Tolerant Networking (DTN), or mix networks.
 Nodes in the network rely on end-to-end encrypted object storage
 and end-to-end encrypted publish-subscribe (pub/sub) notifications
 with location privacy for end-user devices.
@@ -51,8 +50,8 @@ that offers immutable block storage, data synchronization,
 and asynchronous publish-subscribe change notification services.
 
 The two-tier network architecture consists of
-a stable core network with an overlay network for each repository with a low-latency P2P pub/sub protocol,
-and ephemeral edge networks that use Delay/Disruption Tolerant Networking protocols for synchronization.
+a stable core network with an overlay network for each repository with a low-latency P2P pub/sub protocol or mix network,
+and ephemeral edge networks that use P2P or DTN protocols for synchronization.
 On edge networks, edge nodes can synchronize locally and directly between each other,
 and can also connect to designated core nodes that store and forwards encrypted objects and change notifications for them,
 with such a core node acting as a pub/sub broker and object store for edge nodes.
