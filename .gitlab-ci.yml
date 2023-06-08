@@ -8,8 +8,13 @@ pages:
   stage: deploy
   script:
     - apk update
-    - apk add wget make git graphviz py3-pip texlive-full texmf-dist texlive-xetex librsvg
+    - apk add wget make git graphviz py3-pip texlive-full texmf-dist texlive-xetex librsvg fontconfig
     - pip install pandoc-include
+    - mkdir -p $HOME/.fonts
+    - wget https://www.gust.org.pl/projects/e-foundry/tex-gyre/pagella/qpl2_501otf.zip
+    - unzip qpl2_501otf.zip
+    - mv qpl2_501otf/*.otf $HOME/.fonts
+    - fc-cache -f $HOME/.fonts
     - git submodule update --init
     - make WEB=1
   artifacts:
