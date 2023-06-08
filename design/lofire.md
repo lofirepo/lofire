@@ -1,8 +1,8 @@
 ---
-title: LoFiRe
-subtitle: Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks
+title: "LoFiRe: Local-First Repositories for Asynchronous Collaboration over Community Overlay Networks"
+subtitle: System Design & Protocol Specifications
 author: TG x Thoth
-date: Draft, updated Nov 2022 -- System Design & Protocol Specifications
+date: Draft, Jan 2023
 bibliography: design/lofire.bib
 ---
 

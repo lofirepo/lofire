@@ -1,6 +1,5 @@
 ---
-title: UPSYCLE
-subtitle: Ubiquitous Publish-Subscribe Infrastructure for Collaboration on Edge Networks
+title: "UPSYCLE: Ubiquitous Publish-Subscribe Infrastructure for Collaboration on Edge Networks"
 author: TG x Thoth
 date: 2020
 bibliography: design/upsycle.bib
