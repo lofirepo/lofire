@@ -1,7 +1,6 @@
 ---
 title: LoFiRe
 subtitle: Local-First Repositories for Collaborative Decentralized Applications
-author: "[P2Pcollab](https://p2pcollab.net)"
 header-image: img/cover.png
 header-image-class: invert
 ---
@@ -171,33 +170,30 @@ These objects are referenced from the mutable store.
 
 ## Repositories
 
-- [Protocol design & specifications](https://github.com/p2pcollab/lofire)
-- [Rust implementation](https://github.com/p2pcollab/lofire-rs)
+- [Protocol design & specifications](https://github.com/lofirepo/lofire)
+- [Rust implementation](https://github.com/lofirepo/lofire-rs)
 
-## Users
+## Related projects
 
-Projects using LoFiRe:
+Collaborative peer-to-peer research:
+
+- [P2Pcollab](https://p2pcollab.net)
+
+Projects based on / inspired by the LoFiRe design:
 
 - [NextGraph](https://nextgraph.org)
 
 ## Contact
 
-- Email: [#@p2pcollab.net](mailto:#@p2pcollab.net)
-- IRC: [#p2pcollab@irc.oftc.net](ircs://irc.oftc.net:6697/p2pcollab)
-- XMPP: [p2pcollab@chat.disroot.org](xmpp:p2pcollab@chat.disroot.org)
-- Matrix: [#p2pcollab:asra.gr](https://matrix.to/#/#p2pcollab:asra.gr)
-- Twitter: [@p2pcollab](https://twitter.com/p2pcollab)
-
-## Donate
-
-[We accept donations](https://p2pcollab.net/donate) in order to be able to continue research & development of local-first protocols and applications.
+- Email: [#@lofi.re](mailto:#@lofi.re)
+- Matrix: [#lofire:asra.gr](https://matrix.to/#/#lofire:asra.gr)
+- Twitter: [@lofirepo](https://twitter.com/lofirepo)
 
 ## Funding
 
-This project was funded through the [NGI0 Discovery Fund](https://nlnet.nl/discovery), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://ngi.eu/) programme, under the aegis of DG Communications Networks, Content and Technology under grant agreement No 825322.
+Until 2022 this project was funded through the [NGI0 Discovery Fund](https://nlnet.nl/discovery), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://ngi.eu/) programme, under the aegis of DG Communications Networks, Content and Technology under grant agreement No 825322.
 
-## See also
+## References
 
-- [P2Pcollab](https://p2pcollab.net)
 - [Cover image](https://tg-x.net/lsys/#?i=30&r=L%20%3A%20S%0AS%20%3A%20F%2B%3E%5BF-Y%5BS%5D%5DF%29G%0AY%20%3A--%5B%7CF-F-FY%5D%0AG%3A%20FGY%5B%2BF%5D%2BY&p.size=9,0.0001&p.angle=-3769.0402,0.042717&offsets=0,0,0&s.size=8.8,7.5&s.angle=7.6,4&l=0.218&c=black,white,cyan,#e8cc00,#007272,#ff4c00&play=0&anim=return%20%7B%0A%20angle%3A%20t%2F50%2C%0A%20angleG%3A%20t%2F50%2C%0A%20size%3A%20null%2C%0A%20sizeG%3A%20null%2C%0A%20offsetX%3A%20null%2C%0A%20offsetY%3A%20null%2C%0A%20rotation%3A%20null%0A%20%7D&name=pollenate) --
   [L-system](https://en.wikipedia.org/wiki/L-system) rules
