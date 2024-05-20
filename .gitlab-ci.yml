@@ -9,6 +9,9 @@ pages:
   script:
     - apk update
     - apk add wget make git graphviz py3-pip texlive-full texmf-dist texlive-xetex librsvg fontconfig
+    - mkdir -p venv
+    - python3 -m venv venv
+    - source venv/bin/activate
     - pip install pandoc-include
     - mkdir -p $HOME/.fonts
     - wget https://www.gust.org.pl/projects/e-foundry/tex-gyre/pagella/qpl2_501otf.zip
